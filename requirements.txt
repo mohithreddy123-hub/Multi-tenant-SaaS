@@ -1,0 +1,10 @@
+asgiref
+channels
+cryptography
+daphne
+django
+django-cors-headers
+djangorestframework
+djangorestframework-simplejwt
+sqlparse
+tzdata

@@ -1,0 +1,60 @@
+# ========================================================================
+# HOW TO RUN THE MULTI-TENANT SAAS PROJECT (WINDOWS)
+# ========================================================================
+
+This guide will help you start both the Backend (Django) and Frontend (React)
+manually in your terminal.
+
+------------------------------------------------------------------------
+PREREQUISITES
+------------------------------------------------------------------------
+- Python 3.10+ installed
+- Node.js installed
+
+------------------------------------------------------------------------
+PART 1: THE BACKEND (Django)
+------------------------------------------------------------------------
+Open a NEW terminal window and run these commands one by one:
+
+1. Create a Virtual Environment (if you haven't yet):
+   python -m venv .venv
+
+2. Activate the Virtual Environment:
+   .venv\Scripts\activate
+
+3. Install all Backend Dependencies:
+   pip install -r requirements.txt
+
+4. Run Database Migrations:
+   python manage.py migrate
+
+5. START THE BACKEND SERVER:
+   python manage.py runserver 8000
+
+--- The Backend is now running at http://127.0.0.1:8000 ---
+
+------------------------------------------------------------------------
+PART 2: THE FRONTEND (React / Vite)
+------------------------------------------------------------------------
+Open a SECOND terminal window and run these commands:
+
+1. Go into the frontend folder:
+   cd frontend
+
+2. Install all Frontend Dependencies:
+   npm install
+
+3. START THE FRONTEND DEV SERVER:
+   npm run dev
+
+--- The Frontend is now running at http://localhost:5173 ---
+
+------------------------------------------------------------------------
+SUMMARY OF PORTS
+------------------------------------------------------------------------
+- BACKEND API: http://127.0.0.1:8000
+- FRONTEND UI: http://localhost:5173
+- ADMIN PANEL: http://127.0.0.1:8000/admin (Default login: admin / Admin@1234)
+
+Happy coding!
+========================================================================

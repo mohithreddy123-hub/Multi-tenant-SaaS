@@ -1,0 +1,365 @@
+[
+{
+  "model": "sessions.session",
+  "pk": "r7l1k46alr0efy0cmzvyfchlw7o9aba3",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hBAKFOX7nsGMgyDVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwJ3ERTpx-t4j04LqDdMd6a5JaXZc5yl2RB-1yaomf18P9OyjYy7eOOWn0SpMhGM4eNA9KG7YqRzt67TBztooAODudrVOOkk-IBARmRCfeH-gcODI:1w3GJI:Q_5alYLBrWdtjGUNvy3H9eVZeGHeoN-7qZ1djOWz1OM",
+    "expire_date": "2026-04-02T16:33:24.090Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "t3fwazoyuguo5mr47kzothni3umesi0f",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hBAKFOX7nsGMgyDVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwJ3ERTpx-t4j04LqDdMd6a5JaXZc5yl2RB-1yaomf18P9OyjYy7eOOWn0SpMhGM4eNA9KG7YqRzt67TBztooAODudrVOOkk-IBARmRCfeH-gcODI:1w2TWZ:d0k2G9CgiG_urqE_nBBCCtCmyWb5-cruDmljl_ktn5Q",
+    "expire_date": "2026-03-31T12:27:51.480Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "yel4skpymlitzk6anyaiznpv6sxx1xz3",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hBAKFOX7nsGMgyDVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwJ3ERTpx-t4j04LqDdMd6a5JaXZc5yl2RB-1yaomf18P9OyjYy7eOOWn0SpMhGM4eNA9KG7YqRzt67TBztooAODudrVOOkk-IBARmRCfeH-gcODI:1w2THT:aAkRiBmZL5iR--dJjnE5Fe5NqICqLqGNBoLB7IsZpBs",
+    "expire_date": "2026-03-31T12:12:15.656Z"
+  }
+},
+{
+  "model": "core.tenant",
+  "pk": "3b6c8fd7-7a89-4a09-a741-90f5585c93cd",
+  "fields": {
+    "name": "BetaVentures",
+    "domain": "betaventures.yourapp.com",
+    "plan": "growth",
+    "is_active": true,
+    "created_at": "2026-03-17T11:46:57.526Z"
+  }
+},
+{
+  "model": "core.tenant",
+  "pk": "8f1cd62f-c4c9-4784-8eb3-553995fd5db2",
+  "fields": {
+    "name": "NewCorp",
+    "domain": "newcorp.yourapp.com",
+    "plan": "starter",
+    "is_active": true,
+    "created_at": "2026-03-17T11:49:07.396Z"
+  }
+},
+{
+  "model": "core.tenant",
+  "pk": "8f77e2a1-f51c-4fd8-b1ec-63578a3de276",
+  "fields": {
+    "name": "TechStartup",
+    "domain": "techstartup.yourapp.com",
+    "plan": "starter",
+    "is_active": true,
+    "created_at": "2026-03-16T15:24:56.780Z"
+  }
+},
+{
+  "model": "core.tenant",
+  "pk": "b5ecaaed-f800-4ccd-bec8-0181b0c4d5be",
+  "fields": {
+    "name": "AcmeCorp",
+    "domain": "acmecorp.yourapp.com",
+    "plan": "growth",
+    "is_active": true,
+    "created_at": "2026-03-16T15:15:15.585Z"
+  }
+},
+{
+  "model": "core.tenant",
+  "pk": "f269cfc2-21f6-4dd0-957a-e392134f9000",
+  "fields": {
+    "name": "GeminiCorp",
+    "domain": "geminicorp.yourapp.com",
+    "plan": "starter",
+    "is_active": true,
+    "created_at": "2026-03-26T16:28:00.583Z"
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$u2EewszfRMgrjan21LbVpD$5ZhVwYwqyo8osodwsvO0JLrS1nD0YKxyIT7cvZjrHGs=",
+    "last_login": "2026-03-16T15:16:20.420Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@saas.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-03-16T15:14:48.854Z",
+    "tenant": null,
+    "role": "employee",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$IaXEgF9TBKMaCoJPLvzH4T$LTW+FL1CzmKDRvLhciiwFvWBiDNfcp8PLtj2MvF8N2o=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "startup_admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@techstartup.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-16T15:24:56.817Z",
+    "tenant": "8f77e2a1-f51c-4fd8-b1ec-63578a3de276",
+    "role": "admin",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$Cua0cZXzNmzi0lbrDJ6TfA$CU/F9uLVUndzFhJ6slrtUYyjOHgVMoauAi080pPCrpw=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "beta_admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@betaventures.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-17T11:46:57.533Z",
+    "tenant": "3b6c8fd7-7a89-4a09-a741-90f5585c93cd",
+    "role": "admin",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$0XaZSoZaEFBI2uQPyYbEsn$AEJm1kjsgYih9giL4FPZr+w2+KMY+KoG/ddn65a4q5c=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "newcorp_admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@newcorp.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-17T11:49:07.470Z",
+    "tenant": "8f1cd62f-c4c9-4784-8eb3-553995fd5db2",
+    "role": "admin",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$bT7cOuIRWoXuzTlxWyXn4P$9hKDjvMZsbHmHwtMunp925hgGZR7cGg7NsXBahrJ90A=",
+    "last_login": "2026-03-19T16:33:24.072Z",
+    "is_superuser": true,
+    "username": "admin3",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin3@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-03-17T12:11:04.490Z",
+    "tenant": null,
+    "role": "employee",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$yq2OzB0KaGWcbwWxGRFcBI$PrhqGxn95xzk6Rh2NVTCvVDMwq6E3IOdCT+pFfQ0wA0=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "geminiadmin",
+    "first_name": "",
+    "last_name": "",
+    "email": "gemini@test.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-26T16:28:00.610Z",
+    "tenant": "f269cfc2-21f6-4dd0-957a-e392134f9000",
+    "role": "admin",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.subscription",
+  "pk": 1,
+  "fields": {
+    "tenant": "b5ecaaed-f800-4ccd-bec8-0181b0c4d5be",
+    "start_date": "2026-03-17",
+    "expiry_date": "2027-03-17",
+    "is_active": true
+  }
+},
+{
+  "model": "core.subscription",
+  "pk": 2,
+  "fields": {
+    "tenant": "3b6c8fd7-7a89-4a09-a741-90f5585c93cd",
+    "start_date": "2026-03-17",
+    "expiry_date": "2027-03-17",
+    "is_active": true
+  }
+},
+{
+  "model": "core.subscription",
+  "pk": 3,
+  "fields": {
+    "tenant": "8f1cd62f-c4c9-4784-8eb3-553995fd5db2",
+    "start_date": "2026-03-17",
+    "expiry_date": "2027-03-17",
+    "is_active": true
+  }
+},
+{
+  "model": "core.subscription",
+  "pk": 4,
+  "fields": {
+    "tenant": "8f77e2a1-f51c-4fd8-b1ec-63578a3de276",
+    "start_date": "2026-03-17",
+    "expiry_date": "2027-03-17",
+    "is_active": true
+  }
+},
+{
+  "model": "core.subscription",
+  "pk": 5,
+  "fields": {
+    "tenant": "f269cfc2-21f6-4dd0-957a-e392134f9000",
+    "start_date": "2026-03-26",
+    "expiry_date": "2027-03-26",
+    "is_active": true
+  }
+},
+{
+  "model": "core.invoice",
+  "pk": 1,
+  "fields": {
+    "tenant": "b5ecaaed-f800-4ccd-bec8-0181b0c4d5be",
+    "amount": "299.00",
+    "issued_at": "2026-03-17T11:54:05.487Z",
+    "due_date": "2026-04-16",
+    "status": "pending",
+    "payment_method": null,
+    "paid_at": null
+  }
+},
+{
+  "model": "core.invoice",
+  "pk": 2,
+  "fields": {
+    "tenant": "3b6c8fd7-7a89-4a09-a741-90f5585c93cd",
+    "amount": "299.00",
+    "issued_at": "2026-03-17T11:54:05.507Z",
+    "due_date": "2026-04-16",
+    "status": "paid",
+    "payment_method": "UPI",
+    "paid_at": "2026-03-17T12:44:57.930Z"
+  }
+},
+{
+  "model": "core.invoice",
+  "pk": 3,
+  "fields": {
+    "tenant": "8f1cd62f-c4c9-4784-8eb3-553995fd5db2",
+    "amount": "99.00",
+    "issued_at": "2026-03-17T11:54:05.517Z",
+    "due_date": "2026-04-16",
+    "status": "paid",
+    "payment_method": "UPI",
+    "paid_at": "2026-03-27T09:16:53.790Z"
+  }
+},
+{
+  "model": "core.invoice",
+  "pk": 4,
+  "fields": {
+    "tenant": "8f77e2a1-f51c-4fd8-b1ec-63578a3de276",
+    "amount": "99.00",
+    "issued_at": "2026-03-17T11:54:05.526Z",
+    "due_date": "2026-04-16",
+    "status": "paid",
+    "payment_method": "UPI",
+    "paid_at": "2026-03-27T09:57:23.615Z"
+  }
+},
+{
+  "model": "core.document",
+  "pk": 1,
+  "fields": {
+    "tenant": "3b6c8fd7-7a89-4a09-a741-90f5585c93cd",
+    "uploaded_by": [
+      "beta_admin"
+    ],
+    "title": "Top Secret Report",
+    "original_filename": "report.txt",
+    "file_type": "text/plain",
+    "file_size": 63,
+    "encrypted_file": "encrypted_docs/2026/03/report.txt",
+    "created_at": "2026-03-17T13:12:23.447Z",
+    "updated_at": "2026-03-17T13:12:23.447Z"
+  }
+},
+{
+  "model": "core.documentversion",
+  "pk": 1,
+  "fields": {
+    "document": 1,
+    "version_number": 1,
+    "encrypted_file": "encrypted_versions/2026/03/report.txt",
+    "created_by": [
+      "beta_admin"
+    ],
+    "created_at": "2026-03-17T13:12:23.455Z"
+  }
+},
+{
+  "model": "core.auditlog",
+  "pk": 1,
+  "fields": {
+    "tenant": "3b6c8fd7-7a89-4a09-a741-90f5585c93cd",
+    "user": [
+      "beta_admin"
+    ],
+    "action": "UPLOAD",
+    "document": 1,
+    "timestamp": "2026-03-17T13:12:23.462Z",
+    "detail": "Uploaded report.txt (63 bytes)"
+  }
+},
+{
+  "model": "core.auditlog",
+  "pk": 2,
+  "fields": {
+    "tenant": "3b6c8fd7-7a89-4a09-a741-90f5585c93cd",
+    "user": [
+      "beta_admin"
+    ],
+    "action": "DOWNLOAD",
+    "document": 1,
+    "timestamp": "2026-03-17T13:12:23.473Z",
+    "detail": "Downloaded report.txt"
+  }
+},
+{
+  "model": "core.fileanalytics",
+  "pk": 1,
+  "fields": {
+    "document": 1,
+    "views_count": 0,
+    "edits_count": 0,
+    "downloads_count": 1
+  }
+}
+]

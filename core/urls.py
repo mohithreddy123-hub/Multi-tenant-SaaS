@@ -1,0 +1,42 @@
+from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
+
+from .views import (
+    TenantRegisterView,
+    LoginView,
+    MeView,
+    DashboardView,
+    BillingView,
+    PayInvoiceView,
+    DocumentListView,
+    DocumentUploadView,
+    DocumentDownloadView,
+    DocumentVersionListView,
+    DocumentRollbackView,
+    DocumentAnalyticsView,
+)
+
+urlpatterns = [
+    # Auth Endpoints
+    path('auth/register/', TenantRegisterView.as_view(), name='tenant-register'),
+    path('auth/login/',    LoginView.as_view(),           name='login'),
+    path('auth/refresh/',  TokenRefreshView.as_view(),    name='token-refresh'),
+    path('auth/me/',       MeView.as_view(),              name='me'),
+
+    # Dashboard & Billing
+    path('dashboard/',     DashboardView.as_view(),       name='dashboard'),
+    path('billing/',       BillingView.as_view(),         name='billing'),
+    path('billing/pay/',   PayInvoiceView.as_view(),      name='pay-invoice'),
+
+    # Documents — Core
+    path('documents/',                           DocumentListView.as_view(),        name='document-list'),
+    path('documents/upload/',                    DocumentUploadView.as_view(),      name='document-upload'),
+    path('documents/<int:pk>/download/',         DocumentDownloadView.as_view(),    name='document-download'),
+
+    # Documents — Versioning
+    path('documents/<int:pk>/versions/',                         DocumentVersionListView.as_view(), name='document-versions'),
+    path('documents/<int:pk>/rollback/<int:version_number>/',    DocumentRollbackView.as_view(),    name='document-rollback'),
+
+    # Documents — Analytics
+    path('documents/<int:pk>/analytics/', DocumentAnalyticsView.as_view(), name='document-analytics'),
+]

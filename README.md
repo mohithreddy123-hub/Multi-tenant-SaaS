@@ -1,187 +1,150 @@
 <div align="center">
-  <h1>🏢 Multi-Tenant SaaS Platform</h1>
+  <h1>🏢 TenantVault</h1>
   <p>An enterprise-grade, structurally isolated Multi-Tenant SaaS application featuring zero-knowledge encrypted file storage, real-time WebSockets, and collaborative text editing.</p>
+  
+  [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+  [![Django](https://img.shields.io/badge/Django-6.0-green.svg)](https://www.djangoproject.com/)
+  [![React](https://img.shields.io/badge/React-19-blue.svg)](https://reactjs.org/)
+  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18.3-blue.svg)](https://www.postgresql.org/)
 </div>
 
 ---
 
 ## 📖 Table of Contents
-1. [About The Project](#about-the-project)
-2. [What is an "Enterprise Grade" System?](#what-is-an-enterprise-grade-system)
-3. [Core Architecture & Multi-Tenancy](#core-architecture--multi-tenancy)
+1. [About TenantVault](#about-tenantvault)
+2. [Why Enterprise Grade?](#why-enterprise-grade)
+3. [Core Architecture](#core-architecture)
 4. [Key Features](#key-features)
-5. [Complete Project Structure](#complete-project-structure)
+5. [Project Structure](#project-structure)
 6. [API Endpoints](#api-endpoints)
 7. [Screenshots](#screenshots-current-state)
-8. [Future Roadmap (PostgreSQL Migration)](#future-roadmap)
-9. [How to Run Locally](#how-to-run-locally)
+8. [Setup & Installation](#setup--installation)
+9. [Future Roadmap](#future-roadmap)
 
 ---
 
-## 🚀 About The Project
+## 🚀 About TenantVault
 
-This project was built to solve the complex problem of **B2B (Business-to-Business) Multi-Tenancy**. 
+**TenantVault** is an enterprise-grade **B2B (Business-to-Business) SaaS platform** designed for secure information management. 
 
-Unlike a standard application where all users belong to the same pool, this app allows multiple distinct *Companies* (Tenants) to register. Once registered, every user, document, and invoice they create is strictly isolated from other companies using a **Shared Database, Shared Schema** architecture.
+Our core philosophy is **Privacy by Design**. Unlike standard applications where all users belong to the same pool, TenantVault allows multiple distinct *Companies* (Tenants) to register. Data isolation is maintained at the architectural level, ensuring maximum security and compliance.
 
-### What is an "Enterprise-Grade" System?
-"Enterprise-grade" means the software is built to handle the strict security, scalability, and performance demands of large businesses. In this project, it means:
-*   **Data Isolation**: Company A can never accidentally query Company B's data.
-*   **Zero-Knowledge Encryption**: We don't just hide files; we scramble them into unreadable bytes before they ever touch the hard drive.
-*   **Real-Time Capabilities**: Utilizing ASGI and WebSockets to push live updates, which is vastly more complex than standard HTTP request-response loops.
+### Why "Enterprise-Grade"?
+*   **Infrastructure**: Built on **PostgreSQL 18.3**, the most advanced relational database for handling thousands of concurrent enterprise queries.
+*   **Zero-Knowledge Encryption**: Files are encrypted server-side using **AES-128 (Fernet Algorithm)** before they ever touch the disk.
+*   **Structural Isolation**: Company A can never query Company B's data due to our custom tenant-aware middleware.
+*   **Persistence**: Real-time capabilities handled via **Django Channels** and **WebSockets** for an "always-on" user experience.
 
 ---
 
-## 🏗️ Core Architecture & Multi-Tenancy
+## 🏗️ Core Architecture
 
-The entire system rotates around the `Tenant` database model. 
+TenantVault uses a **Shared Database, Shared Schema** architecture with strict ID-based filtration.
 
 ```text
-               [ Database ]
-                     |
-         +-----------+-----------+
-         |                       |
-    [Tenant A]              [Tenant B]
-      - Users                 - Users
-      - Encrypted Docs        - Encrypted Docs
-      - Subscriptions         - Subscriptions
+               [ PostgreSQL 18.3 ]
+                      |
+         +------------+------------+
+         |                         |
+    [Tenant A]                [Tenant B]
+    (Company A)               (Company B)
+      - Users                  - Users
+      - Scrambled Docs         - Scrambled Docs
+      - Invoices               - Invoices
 ```
-Every API request made by the Frontend carries a **custom JWT (JSON Web Token)** that contains the `tenant_id`. The Backend middleware intercepts this token and automatically filters all database queries to ensure users only see their own company's data.
+Every request carries a **JWT (JSON Web Token)** that identifies the user and their company. Our internal system automatically filters every database query to ensure users only interact with their company's "Vault."
 
 ---
 
 ## ✨ Key Features
 
-1. **Custom Authentication & Workspaces**
-   * Role-based access control (Admins vs Standard Users).
-   * JWT based secure login.
+1.  **🚀 Premium Landing Page**
+    *   Professional "SaaS-style" entry point detailing product features and pricing.
+    *   Integrated login/signup modals for a seamless user experience.
 
-2. **Secure Encrypted File Manager**
-   * Uploaded documents are encrypted via **AES-128 (Fernet Algorithm)**.
-   * On-the-fly decryption streaming only when an authorized download occurs.
-   * Full file versioning (rollbacks) and download/view analytics.
+2.  **🔐 Zero-Knowledge File Manager**
+    *   Server-side encryption scambles files before storage.
+    *   On-the-fly decryption streaming only for authorized users.
+    *   Full file versioning (revert to previous states) and activity analytics.
 
-3. **Real-Time Collaborative Editor**
-   * Uses Django Channels and WebSockets.
-   * Multiple users within the same tenant can type in the same document simultaneously.
-   * Remote cursor tracking.
+3.  **⚡ Real-Time Collaboration**
+    *   Shared text editor allowing multiple users to type simultaneously.
+    *   Live remote cursor tracking via WebSockets.
 
-4. **Billing & Invoices Engine**
-   * Tracks storage limits (e.g., 50GB for Starter, 500GB for Growth).
-   * Generates invoices and tracks simulated payment statuses.
+4.  **📊 Live Dashboard Sync**
+    *   Instant UI updates when files are uploaded or limits are reached, powered by **Daphne** and **Django Channels**.
+
+5.  **💳 Billing & Quota Engine**
+    *   Tracks storage consumption (GB) across the tenant.
+    *   Automatic invoice generation and subscription tier management.
 
 ---
 
-## 📂 Complete Project Structure
+## 🛠️ Technology Stack
 
-Understanding the layout is critical for navigating this massive codebase:
+| Component | Technology |
+|:---|:---|
+| **Backend** | Django 6.0, Django REST Framework |
+| **Real-Time** | Daphne, WebSockets, Django Channels |
+| **Database** | **PostgreSQL 18.3** (Connected via Psycopg 3) |
+| **Frontend** | React 19, Vite, React Router, Axios |
+| **Security** | Fernet (AES-128), SimpleJWT, CORS Protection |
+
+---
+
+## 📂 Project Structure
 
 ```text
-Multi-tenant-SaaS/
-│
-├── backend/                       # ✅ Django Project Configuration
-│   ├── settings.py                # Database, Installed Apps, Security config
-│   ├── urls.py                    # Master traffic router
-│   └── asgi.py                    # Crucial: Configured for WebSockets (Channels)
-│
-├── core/                          # ✅ Main Application Logic
-│   ├── models.py                  # Database tables (Tenant, User, Document, etc.)
-│   ├── views.py                   # REST API logic (Uploads, Auth, Billing)
-│   ├── serializers.py             # Translates Database rows into JSON for React
-│   ├── urls.py                    # API Routes mapping
-│   ├── consumers.py               # WebSocket Handlers (Real-time live sync logic)
-│   ├── routing.py                 # WebSocket URL mapping
-│   ├── utils/
-│   │   └── encryption.py          # The AES-128 Fernet encryption engine
-│   └── migrations/                # Database history state tracking
-│
-├── frontend/                      # ✅ React UI (Vite)
-│   ├── package.json               # Node.js dependencies
-│   ├── src/
-│   │   ├── api.js                 # Axios HTTP client (Injects JWTs into headers)
-│   │   ├── App.jsx                # Main React Router connecting all pages
-│   │   ├── index.css              # Custom Glassmorphism styling system
-│   │   ├── contexts/
-│   │   │   └── AuthContext.jsx    # Global state holding the user's login session
-│   │   └── pages/                 # The Visual Screens
-│   │       ├── Dashboard.jsx      # Live websocket-connected overview
-│   │       ├── Documents.jsx      # The Encrypted File Manager Interface
-│   │       ├── Editor.jsx         # The Collaborative Text Editor
-│   │       ├── Invoices.jsx       # Billing UI
-│   │       └── Login/Signup.jsx   # Authentication entries
-│
-├── manage.py                      # Django execution script
-├── requirements.txt               # Python dependencies
-└── HOW_TO_RUN_PROJECT.txt         # Terminal execution manual
+TenantVault/
+├── backend/            # Django Settings & Protocol Configuration (ASGI)
+├── core/               # Enterprise Logic: Encryption, WebSockets, Models, Views
+├── frontend/           # React 19 SPA (Vite)
+│   ├── src/pages/      # Dashboard, Documents, Editor, Invoices, Login
+│   └── src/contexts/   # Global Auth & State Management
+├── manage.py           # Management script
+└── requirements.txt    # Python dependency manifest
 ```
 
 ---
 
-## 🔌 API Endpoints Summary
+## 🔌 API Endpoints (Core)
 
-A quick look at the central REST interactions:
-
-| Method | Endpoint | Purpose |
+| Method | Endpoint | Description |
 |:---|:---|:---|
-| `POST` | `/api/auth/register/` | Creates a new Tenant Workspace and Admin Account |
-| `POST` | `/api/auth/login/` | Returns JWT Access/Refresh tokens |
-| `GET`  | `/api/dashboard/` | Returns Tenant stats (Storage, Users) |
-| `POST` | `/api/documents/upload/` | Encrypts and stores a new file |
-| `GET`  | `/api/documents/<id>/download/` | Decrypts and streams a file to the user |
-| `POST` | `/api/documents/<id>/rollback/` | Reverts an encrypted file to a previous version |
-
-*(And many more WebSockets mapped via `ws://.../ws/tenant/` routes)*
+| `POST` | `/api/auth/register/` | Register a new Company Tenant & Admin |
+| `POST` | `/api/auth/login/` | Secure JWT Authentication |
+| `POST` | `/api/documents/upload/` | Encrypt & Upload a new document |
+| `GET`  | `/api/documents/<id>/download/` | Decrypt & Stream a document |
 
 ---
 
-## 📸 Screenshots (Current State)
+## 💻 Setup & Installation
 
-*(Placeholders for actual images. Replace `link-to-image` with your actual screenshots when you upload them to GitHub)*
+TenantVault requires **Python 3.12+**, **Node.js**, and a local **PostgreSQL 18.3** instance.
 
-### 1. The Multi-Tenant Dashboard
-![Dashboard Placeholder](https://via.placeholder.com/800x400.png?text=Dashboard+UI+-+Showing+Storage+Limits)
+1.  **Backend**:
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+    pip install -r requirements.txt
+    python manage.py migrate
+    python manage.py runserver
+    ```
 
-### 2. Encrypted Document Manager
-![Documents Placeholder](https://via.placeholder.com/800x400.png?text=Document+Manager+-+Uploads+%26+Versions)
-
-### 3. Collaborative Live Editor
-![Editor Placeholder](https://via.placeholder.com/800x400.png?text=Real-Time+Text+Editor+with+Live+Cursors)
-
----
-
-## 🔜 Future Roadmap (What's Next?)
-
-Although the core engine is perfectly functional, there are massive plans to upgrade the infrastructure of this project. **I am currently learning advanced SQL to achieve the following step:**
-
-1. **🔥 PostgreSQL Migration (Current Priority)**
-   * **Why?** We are currently using SQLite. SQLite locks the entire database file when a single user writes to it. In a multi-tenant environment, this bottlenecks instantly. Moving to PostgreSQL allows thousands of concurrent queries safely.
-   
-2. **Background Tasks (Celery & Redis)**
-   * Offloading file encryption to background workers so large files don't freeze the HTTP response.
-   
-3. **AWS S3 Cloud Storage**
-   * Transitioning from local hard drive storage to scalable cloud buckets.
+2.  **Frontend**:
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
+    ```
 
 ---
 
-## 💻 How To Run Locally
+## 🔜 Future Roadmap
 
-If you clone this repository, you must run both the backend and frontend in separate terminals.
+-   **⚡ Celery + Redis**: Offloading encryption to background workers for instant responses.
+-   **💳 Stripe Integration**: Real-world payment processing.
+-   **☁️ AWS S3 Migration**: Moving encrypted blobs to the cloud.
 
-**1. Start the Backend:**
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver 8000
-```
-
-**2. Start the Frontend:**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-> **Security Warning**: Ensure `.env`, `db.sqlite3`, and any credentials text files are added to `.gitignore` before deploying or pushing.
+---
+*Created and Maintained by Mohith Reddy.*

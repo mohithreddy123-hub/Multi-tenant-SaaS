@@ -20,9 +20,9 @@ const ProtectedRoute = ({ children }) => {
 
 const AppContent = () => (
   <Routes>
-    <Route path="/" element={<Navigate to="/login" replace />} />
-    <Route path="/register" element={<Signup />} />
+    <Route path="/" element={<Login />} />
     <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Signup />} />
 
     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
     <Route path="/billing"   element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
@@ -32,7 +32,7 @@ const AppContent = () => (
     <Route path="/editor/:docId" element={<ProtectedRoute><Editor /></ProtectedRoute>} />
 
     {/* Fallback */}
-    <Route path="*" element={<Navigate to="/login" replace />} />
+    <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
 

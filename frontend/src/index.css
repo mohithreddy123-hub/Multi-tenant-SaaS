@@ -736,3 +736,128 @@ p {
   margin-bottom: 1.8rem;
   font-size: 0.97rem;
 }
+
+/* ===== HIGH-SECURITY PAYMENT MODAL ===== */
+
+.payment-card-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+}
+
+.security-footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.security-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.security-badge span { color: var(--accent-success); font-weight: 700; }
+
+.bank-logo {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+/* OTP Simulation */
+.otp-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.otp-grid {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.otp-box {
+  width: 45px;
+  height: 55px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.otp-box:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+  outline: none;
+}
+
+/* Processing Pulse */
+.processing-status {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.pulse-loader {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  margin: 0 auto 1.5rem;
+  opacity: 0.6;
+  animation: pulseScale 1.5s ease-out infinite;
+}
+
+@keyframes pulseScale {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.processing-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.processing-sub {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+/* Success State */
+.success-check {
+  width: 80px;
+  height: 80px;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin: 0 auto 1.5rem;
+  animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes bounceIn {
+  from { opacity: 0; transform: scale(0.3); }
+  to { opacity: 1; transform: scale(1); }
+}

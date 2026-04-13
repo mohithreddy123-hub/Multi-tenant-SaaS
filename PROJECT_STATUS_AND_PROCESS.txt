@@ -1,0 +1,97 @@
+================================================================================
+MULTI-TENANT SAAS PLATFORM: STATUS, PENDING IMPLEMENTATIONS & OVERALL PROCESS
+================================================================================
+
+This document serves to track the exact state of the project: what has been fully completed, the pending implementations required for production, and the overall working flow of the entire system.
+
+--------------------------------------------------------------------------------
+PART 1: WHAT WE HAVE COMPLETED & OUR CURRENT PROCESS
+--------------------------------------------------------------------------------
+We have successfully built the core functional engine of the SaaS platform. The process we followed was to first establish a strong, isolated database foundation, layer security on top, and finally build real-time interactive features.
+
+COMPLETED FEATURES:
+1. Multi-Tenant Architecture Foundation: 
+   - We built a "Shared Database, Shared Schema" model.
+   - Companies can register as distinct "Tenants". All subsequent data (users, files, invoices) is strictly bound to that specific Tenant ID.
+
+2. Custom JWT Authentication:
+   - Built a secure login system using JSON Web Tokens.
+   - The token automatically carries the `tenant_id`, forcing the backend to instantly filter out any data that does not belong to the user's company.
+
+3. Zero-Knowledge Document Encryption:
+   - We implemented AES-128 encryption using the `cryptography` (Fernet) library.
+   - When a user uploads a file, the Python backend scrambles the bytes into unreadable ciphertext BEFORE saving the file to the hard drive. 
+   - Files are dynamically decrypted in-memory only when an authorized download request is made.
+
+4. File Versioning & Analytics:
+   - Users can upload new versions of the same file. They can track views, downloads, and edits.
+   - Users have the ability to "Rollback" a file, replacing the current encrypted file with a historical encrypted version.
+
+5. Real-Time WebSockets (Live Sync):
+   - We upgraded the Django backend to ASGI (using Daphne and Django Channels).
+   - `DashboardConsumer`: If User A uploads a file, User B's dashboard instantly updates its storage limits and file counts without refreshing the page.
+
+6. Collaborative Text Editor:
+   - `EditorConsumer`: We created a WebSocket room where multiple users from the same company can type in a shared text area simultaneously, seeing each other's live remote cursors.
+
+7. Mock Billing Engine:
+   - We created `Subscription` and `Invoice` models that automatically calculate storage usage and generate bills.
+
+--------------------------------------------------------------------------------
+PART 2: PENDING IMPLEMENTATIONS (AND HOW THEY WILL WORK)
+--------------------------------------------------------------------------------
+While the core logic is complete, the following implementations are pending. They are strictly required to transform the app from a "Development Build" into a "Production-Ready Enterprise System."
+
+1. PostgreSQL Database Migration
+   - Current State: We use SQLite, which locks the entire database when one user writes data.
+   - How It Will Work: We will migrate to PostgreSQL. Postgres allows thousands of users to read and write simultaneously without locking the database. It is mandatory for heavy multi-tenant traffic.
+
+2. Background Task Processing (Celery + Redis)
+   - Current State: When a user uploads a 50MB file, the backend stops everything to encrypt it. The user's screen "hangs" waiting for the encryption to finish.
+   - How It Will Work: We will implement Celery. When a file is uploaded, Django instantly says "Success!" to the user. Behind the scenes, a separate Celery "worker process" does the heavy encryption math without freezing the web server.
+
+3. Production WebSocket Scaling (Redis Channel Layer)
+   - Current State: Our WebSockets run on an `InMemoryChannelLayer`. This only works if there is exactly 1 server running.
+   - How It Will Work: We will connect Django Channels to Redis. If we have 5 backend servers running to handle heavy traffic, Redis acts as a central megaphone, allowing a WebSocket message from Server 1 to instantly reach a user connected to Server 4.
+
+4. Real Payment Gateway (Stripe / Razorpay)
+   - Current State: The UI has a "Pay Now" button that fakes a successful payment.
+   - How It Will Work: We will integrate the official Stripe SDK. When a user pays, Stripe securely processes the credit card and sends a "Webhook" ping to our Django backend secretly, which then officially marks the Invoice as 'Paid' in the database.
+
+5. Cloud File Storage (AWS S3)
+   - Current State: Encrypted files are saved to the local `/media/` folder on the computer hard drive. If the hard drive dies, the files are gone.
+   - How It Will Work: We will use `django-storages` and `boto3`. Uploaded files will be encrypted in-memory and then securely streamed directly to a massive, crash-proof Amazon S3 Cloud Bucket.
+
+OVERALL WORKING PROCESS AFTER PENDING IMPLEMENTATIONS:
+Once these 5 pending items are done, the system is fully mature. A user uploads a file -> Django instantly acknowledges it -> Sends it to Celery -> Celery encrypts it and sends it to AWS S3 -> Redis broadcasts a WebSocket ping to all 5 servers -> The UI updates live for everyone in the company. All of this happens over a lightning-fast PostgreSQL database while Stripe automatically bills the company at the end of the month based on the S3 storage space used.
+
+--------------------------------------------------------------------------------
+PART 3: OVERALL PROCESS OF THIS PROJECT (HOW IT WORKS)
+--------------------------------------------------------------------------------
+Here is the step-by-step master flow of how the entire application works from top to bottom:
+
+[The Frontend Layer - React/Vite]
+1. The user opens the web app in their browser.
+2. The user types their credentials into the Login.jsx page.
+3. The `api.js` file packages these credentials and sends an HTTP POST request to the backend.
+4. Upon success, React saves a secure JWT (JSON Web Token) in memory. For every future request (like fetching documents), React automatically attaches this Token to the HTTP Header so the backend knows exactly who is asking.
+
+[The Security & Routing Layer - Django]
+5. The API request hits the Django Server (`urls.py`).
+6. Django checks the JWT Token. It extracts the `user_id` and, crucially, the `tenant_id`.
+7. Django routes the request to the correct function in `views.py`.
+
+[The Logic & Database Layer - Django ORM]
+8. In `views.py`, Django talks to the Database (`models.py`). 
+9. Because of our multi-tenant design, EVERY database query enforces the `tenant_id`. (e.g., `Document.objects.filter(tenant=user.tenant_id)`). This guarantees absolute data isolation.
+10. If the request was a file upload, `views.py` passes the file to `utils/encryption.py` to scramble it, saves the scrambled file, and logs the action in the `AuditLog`.
+
+[The Real-Time Layer - WebSockets]
+11. After the database is updated (for example, a new file is uploaded), `views.py` triggers a signal.
+12. Django Channels (`consumers.py`) picks up the signal and blasts a persistent WebSocket message down the open connection.
+13. The React Frontend receives this live ping and instantly updates the UI (graphs, storage limits, or typing cursors) without requiring the user to ever hit the Refresh button.
+
+[The Response Layer]
+14. Finally, Django uses `serializers.py` to convert complex database Python objects back into simple JSON text, and ships it back to the React Frontend as a successful HTTP Response (200 OK).
+
+-- End of Document --

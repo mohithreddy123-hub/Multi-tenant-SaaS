@@ -36,9 +36,18 @@ const Banner = ({ msg }) => {
 
 /* ─── Plan Badge ─────────────────────────────────────── */
 const planMeta = {
-    starter:    { color: '#6b7280', label: 'Starter',    price: '$99/mo',  storage: '50 GB',   users: 5  },
-    growth:     { color: '#6366f1', label: 'Growth',     price: '$299/mo', storage: '500 GB',  users: 20 },
-    enterprise: { color: '#f59e0b', label: 'Enterprise', price: '$999/mo', storage: '2 TB',    users: 100 },
+    starter: { 
+        color: '#6b7280', label: 'Starter', price: '$99/mo', users: 5,
+        features: ['🛡️ Zero-Knowledge Privacy', '🔒 Secure Document Vault', '⚡ Real-time Live Sync']
+    },
+    growth: { 
+        color: '#6366f1', label: 'Growth', price: '$299/mo', users: 20,
+        features: ['🛡️ Zero-Knowledge Privacy', '💬 Internal Team Chat', '⚡ Advanced Real-time Sync', '🔔 Live Update Notifications']
+    },
+    enterprise: { 
+        color: '#f59e0b', label: 'Enterprise', price: '$999/mo', users: 'Unlimited',
+        features: ['🛡️ Dedicated Privacy Node', '🏢 Advanced Access Controls', '💬 Priority Team Channels', '🤝 Dedicated Account Rep']
+    },
 };
 
 /* ─── Main Settings Page ─────────────────────────────── */
@@ -311,7 +320,7 @@ const Settings = () => {
                                 </div>
                                 <div className="input-group">
                                     <label className="input-label">Current Plan</label>
-                                    <input type="text" className="form-input" value={`${currentPlan.label} — ${currentPlan.storage}, ${currentPlan.users} users`} disabled style={{ opacity: 0.5 }} />
+                                    <input type="text" className="form-input" value={`${currentPlan.label} Plan — Up to ${currentPlan.users} users`} disabled style={{ opacity: 0.5 }} />
                                 </div>
                                 <div className="input-group">
                                     <label className="input-label">Member Count</label>
@@ -343,8 +352,12 @@ const Settings = () => {
                                                 )}
                                                 <h4 style={{ margin: '0 0 0.25rem', color: p.color }}>{p.label}</h4>
                                                 <p style={{ margin: '0 0 0.75rem', fontSize: '1.2rem', fontWeight: 700 }}>{p.price}</p>
-                                                <p style={{ margin: '0 0 0.25rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>📁 {p.storage} Storage</p>
-                                                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>👥 Up to {p.users} users</p>
+                                                <p style={{ margin: '0 0 0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>👥 Up to {p.users} users</p>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '1rem' }}>
+                                                    {p.features.map((feat, i) => (
+                                                        <p key={i} style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{feat}</p>
+                                                    ))}
+                                                </div>
                                                 {!isActive && (
                                                     <button className="btn btn-secondary" style={{ width: '100%', marginTop: '1rem', fontSize: '0.8rem' }}>
                                                         Upgrade →
@@ -367,7 +380,7 @@ const Settings = () => {
                                     { key: 'email_login',         label: '🔑 New Login Alert',         desc: 'Get notified when your account is logged into from a new device.' },
                                     { key: 'email_upload',        label: '📄 Document Upload',           desc: 'Email when a new file is uploaded in your workspace.' },
                                     { key: 'email_invoice',       label: '💳 Invoice Generated',         desc: 'Receive a copy of each billing invoice by email.' },
-                                    { key: 'email_storage_alert', label: '💾 Storage Limit Warning',     desc: 'Alert when your workspace reaches 80% storage usage.' },
+                                    { key: 'email_security_alert',label: '🛡️ Security Alerts',          desc: 'Alert when a suspicious login or access attempt occurs.' },
                                 ].map(item => (
                                     <div key={item.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0', borderBottom: '1px solid var(--border-light)' }}>
                                         <div>

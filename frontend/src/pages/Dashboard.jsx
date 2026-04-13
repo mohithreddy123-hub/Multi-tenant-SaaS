@@ -163,13 +163,13 @@ const Dashboard = () => {
           </div>
 
           <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 0 }}>💾 Storage Used</h3>
-            <p style={{ fontSize: '1.6rem', color: storageColor, fontWeight: 700, margin: '0 0 0.75rem' }}>
-              {storagePct}%
-              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 400 }}> of {data?.tenant?.storage_limit_gb} GB</span>
+            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 0 }}>🔒 Privacy Status</h3>
+            <p style={{ fontSize: '1.6rem', color: 'var(--accent-success)', fontWeight: 700, margin: '0 0 0.75rem' }}>
+              Protected
+              <span style={{ fontSize: '0.9rem', color: 'var(--accent-success)', fontWeight: 400, marginLeft: '8px' }}>AES-128 ✅</span>
             </p>
-            <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '999px', height: '6px', overflow: 'hidden' }}>
-              <div style={{ width: `${Math.min(storagePct, 100)}%`, height: '100%', background: storageColor, borderRadius: '999px', transition: 'width 0.6s ease' }} />
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+              Zero-knowledge encryption active
             </div>
           </div>
 

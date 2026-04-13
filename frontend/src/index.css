@@ -861,3 +861,115 @@ p {
   from { opacity: 0; transform: scale(0.3); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* ===== AMAZON-STYLE PAYMENT GATEWAY ===== */
+
+/* Modal override for wider split-panel gateway */
+.modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  position: relative;
+  width: 100%;
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+}
+
+/* Select element styling */
+.form-input option {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Payment method button hover */
+.payment-method-btn:hover {
+  background: rgba(99, 102, 241, 0.08) !important;
+}
+
+/* EMI selector */
+.emi-option {
+  flex: 1;
+  padding: 0.85rem 0.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+/* UPI App grid button */
+.upi-app-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* ===== SETTINGS PAGE ===== */
+
+/* Settings tab active glow */
+.settings-tab-active {
+  background: rgba(99, 102, 241, 0.18) !important;
+  color: var(--brand-primary) !important;
+  font-weight: 600 !important;
+}
+
+/* Password strength bar */
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+
+/* Toggle switch */
+.toggle-switch {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  transition: left 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Plan card */
+.plan-card {
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 2px solid var(--border-light);
+  transition: all 0.2s;
+  position: relative;
+}
+.plan-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+/* Danger zone */
+.danger-zone-card {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: rgba(239, 68, 68, 0.04);
+}
+
+/* Transaction Receipt */
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.82rem;
+}
+.receipt-label { color: var(--text-secondary); }
+.receipt-value { font-weight: 600; color: var(--text-primary); }
+

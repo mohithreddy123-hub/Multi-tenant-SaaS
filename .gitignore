@@ -32,3 +32,8 @@ frontend/*.local
 Thumbs.db
 .vscode/
 .idea/
+
+# Local Project Documentation
+TENANTVAULT_DOCUMENTATION.md
+HOW_TO_RUN_PROJECT.txt
+PROJECT_STATUS_AND_PROCESS.txt

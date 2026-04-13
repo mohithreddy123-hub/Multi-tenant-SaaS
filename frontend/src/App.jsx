@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Invoices from './pages/Invoices';
 import Documents from './pages/Documents';
 import Editor from './pages/Editor';
+import Settings from './pages/Settings';
 
 import './index.css';
 
@@ -27,6 +28,7 @@ const AppContent = () => (
     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
     <Route path="/billing"   element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
     <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+    <Route path="/settings"  element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
     {/* Collaborative Editor — :docId = 0 for scratch pad, or a real doc id */}
     <Route path="/editor/:docId" element={<ProtectedRoute><Editor /></ProtectedRoute>} />

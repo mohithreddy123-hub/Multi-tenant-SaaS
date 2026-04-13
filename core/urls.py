@@ -14,6 +14,9 @@ from .views import (
     DocumentVersionListView,
     DocumentRollbackView,
     DocumentAnalyticsView,
+    UpdateProfileView,
+    UpdatePasswordView,
+    UpdateWorkspaceView,
 )
 
 urlpatterns = [
@@ -27,6 +30,11 @@ urlpatterns = [
     path('dashboard/',     DashboardView.as_view(),       name='dashboard'),
     path('billing/',       BillingView.as_view(),         name='billing'),
     path('billing/pay/',   PayInvoiceView.as_view(),      name='pay-invoice'),
+
+    # Settings API
+    path('settings/profile/',   UpdateProfileView.as_view(),   name='settings-profile'),
+    path('settings/password/',  UpdatePasswordView.as_view(),  name='settings-password'),
+    path('settings/workspace/', UpdateWorkspaceView.as_view(), name='settings-workspace'),
 
     # Documents — Core
     path('documents/',                           DocumentListView.as_view(),        name='document-list'),

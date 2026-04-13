@@ -125,8 +125,13 @@ class InvoiceSerializer(serializers.ModelSerializer):
 
 class ProcessPaymentSerializer(serializers.Serializer):
     invoice_id = serializers.IntegerField()
-    payment_method = serializers.ChoiceField(choices=['UPI', 'Card', 'Net Banking'])
-    # In a real app, we'd have card details / UPI IDs, but here we simulate success
+    # Accept any non-empty string so all UPI apps, banks, EMI variants pass through
+    payment_method = serializers.CharField(max_length=100)
+
+    def validate_payment_method(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Payment method cannot be empty.")
+        return value.strip()
 
 
 # ─────────────────────────────────────────────

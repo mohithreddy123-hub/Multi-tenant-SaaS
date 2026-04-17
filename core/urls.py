@@ -8,6 +8,7 @@ from .views import (
     DashboardView,
     BillingView,
     PayInvoiceView,
+    TeamView,
     DocumentListView,
     DocumentUploadView,
     DocumentDownloadView,
@@ -35,6 +36,10 @@ urlpatterns = [
     path('settings/profile/',   UpdateProfileView.as_view(),   name='settings-profile'),
     path('settings/password/',  UpdatePasswordView.as_view(),  name='settings-password'),
     path('settings/workspace/', UpdateWorkspaceView.as_view(), name='settings-workspace'),
+
+    # Team Management
+    path('team/',              TeamView.as_view(), name='team-list'),
+    path('team/<int:user_id>/', TeamView.as_view(), name='team-delete'),
 
     # Documents — Core
     path('documents/',                           DocumentListView.as_view(),        name='document-list'),

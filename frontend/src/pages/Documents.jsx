@@ -35,10 +35,11 @@ const Documents = () => {
   const fileInputRef = useRef(null);
   const wsRef = useRef(null);
 
-  // Modal states
   const [versionModal, setVersionModal] = useState(null);   // { doc }
   const [analyticsModal, setAnalyticsModal] = useState(null); // { doc, data }
   const [rollingBack, setRollingBack] = useState(false);
+  const [showAttach, setShowAttach] = useState(false);
+  const [acceptType, setAcceptType] = useState("*/*");
 
   useEffect(() => { fetchDocuments(); }, []);
 
@@ -190,12 +191,56 @@ const Documents = () => {
             <h1>Secure Documents</h1>
             <p style={{ margin: 0 }}>All files are AES-128 encrypted. Upload, version, and track analytics.</p>
           </div>
-          <div>
-            <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
-            <button className="btn btn-primary" onClick={() => fileInputRef.current.click()} disabled={uploading}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              {uploading ? <span className="loader" style={{ width: 16, height: 16, borderWidth: 2 }}></span> : '☁️ Upload File'}
+          <div className="attachment-menu-container">
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              style={{ display: 'none' }} 
+              onChange={handleFileChange} 
+              accept={acceptType}
+            />
+            
+            <button 
+              className="btn btn-primary" 
+              onClick={() => setShowAttach(!showAttach)} 
+              disabled={uploading}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            >
+              {uploading 
+                ? <><span className="loader" style={{ width: 16, height: 16, borderWidth: 2 }}></span> Uploading...</> 
+                : (showAttach ? '✕ Cancel' : '☁️ Upload')}
             </button>
+
+            {showAttach && (
+              <div className="attachment-menu">
+                {/* Row 1 */}
+                <button className="attachment-item" onClick={() => { setAcceptType('image/*'); setShowAttach(false); setTimeout(() => fileInputRef.current.click(), 100); }}>
+                  <div className="attachment-icon-circle" style={{ background: 'linear-gradient(135deg, #ec4899, #8b5cf6)' }}>🖼️</div>
+                  <span className="attachment-label">Image</span>
+                </button>
+                <button className="attachment-item" onClick={() => { setAcceptType('video/*'); setShowAttach(false); setTimeout(() => fileInputRef.current.click(), 100); }}>
+                  <div className="attachment-icon-circle" style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)' }}>🎬</div>
+                  <span className="attachment-label">Video</span>
+                </button>
+                <button className="attachment-item" onClick={() => { setAcceptType('audio/*'); setShowAttach(false); setTimeout(() => fileInputRef.current.click(), 100); }}>
+                  <div className="attachment-icon-circle" style={{ background: 'linear-gradient(135deg, #10b981, #06b6d4)' }}>🎙️</div>
+                  <span className="attachment-label">Audio</span>
+                </button>
+                {/* Row 2 */}
+                <button className="attachment-item" onClick={() => { setAcceptType('.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt'); setShowAttach(false); setTimeout(() => fileInputRef.current.click(), 100); }}>
+                  <div className="attachment-icon-circle" style={{ background: 'linear-gradient(135deg, #3b82f6, #6366f1)' }}>📄</div>
+                  <span className="attachment-label">Document</span>
+                </button>
+                <button className="attachment-item" onClick={() => { setAcceptType('.zip,.rar,.7z,.tar,.gz'); setShowAttach(false); setTimeout(() => fileInputRef.current.click(), 100); }}>
+                  <div className="attachment-icon-circle" style={{ background: 'linear-gradient(135deg, #64748b, #334155)' }}>🗜️</div>
+                  <span className="attachment-label">Archive</span>
+                </button>
+                <button className="attachment-item" onClick={() => { setAcceptType('*/*'); setShowAttach(false); setTimeout(() => fileInputRef.current.click(), 100); }}>
+                  <div className="attachment-icon-circle" style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)' }}>📁</div>
+                  <span className="attachment-label">Any File</span>
+                </button>
+              </div>
+            )}
           </div>
         </header>
 

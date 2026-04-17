@@ -97,6 +97,7 @@ class DashboardView(APIView):
                     'domain': 'admin.yourapp.com',
                     'plan': 'Super Admin',
                     'is_active': True,
+                    'payment_status': 'paid',
                     'storage_limit_gb': 0,
                     'user_limit': 0,
                 },
@@ -114,6 +115,20 @@ class DashboardView(APIView):
                 }
             })
 
+        # ━━ PAYMENT WALL: block if tenant has not activated ━━
+        if tenant.payment_status == 'unpaid':
+            # Return the pending invoice so the frontend can show the payment form
+            pending_invoice = tenant.invoices.filter(status='pending').first()
+            return Response({
+                'payment_required': True,
+                'message': 'Your workspace is not yet activated. Please complete your payment.',
+                'invoice': {
+                    'id': pending_invoice.id if pending_invoice else None,
+                    'amount': str(pending_invoice.amount) if pending_invoice else '0.00',
+                    'plan': tenant.plan,
+                } if pending_invoice else None,
+            }, status=status.HTTP_402_PAYMENT_REQUIRED)
+
         total_users = tenant.users.filter(is_active=True).count()
         total_docs = tenant.documents.count()
         used_bytes = sum(d.file_size for d in tenant.documents.all())
@@ -127,6 +142,7 @@ class DashboardView(APIView):
                 'domain': tenant.domain,
                 'plan': tenant.get_plan_display(),
                 'is_active': tenant.is_active,
+                'payment_status': tenant.payment_status,
                 'storage_limit_gb': tenant.storage_limit_gb,
                 'user_limit': tenant.user_limit,
             },
@@ -184,9 +200,16 @@ class PayInvoiceView(APIView):
                 invoice.paid_at = timezone.now()
                 invoice.save()
 
+                # ━━ ACTIVATE the tenant on first successful payment ━━
+                tenant = request.user.tenant
+                if tenant.payment_status == 'unpaid':
+                    tenant.payment_status = 'paid'
+                    tenant.save(update_fields=['payment_status'])
+
                 return Response({
-                    'message': f'Payment of ${invoice.amount} via {method} was successful!',
-                    'invoice': InvoiceSerializer(invoice).data
+                    'message': f'Payment of ₹{invoice.amount} via {method} was successful! Your workspace is now active.',
+                    'invoice': InvoiceSerializer(invoice).data,
+                    'workspace_activated': True,
                 })
             except Invoice.DoesNotExist:
                 return Response({'detail': 'Invoice not found.'}, status=404)

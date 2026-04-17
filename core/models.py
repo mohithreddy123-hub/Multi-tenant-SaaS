@@ -15,10 +15,16 @@ class Tenant(models.Model):
         ('enterprise', 'Enterprise'),
     ]
 
+    PAYMENT_STATUS_CHOICES = [
+        ('unpaid', 'Unpaid'),
+        ('paid', 'Paid'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, unique=True)
     domain = models.CharField(max_length=255, unique=True, blank=True)
     plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default='starter')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

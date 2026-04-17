@@ -11,7 +11,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 class TenantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tenant
-        fields = ['id', 'name', 'domain', 'plan', 'is_active',
+        fields = ['id', 'name', 'domain', 'plan', 'is_active', 'payment_status',
                   'storage_limit_gb', 'user_limit', 'created_at']
         read_only_fields = ['id', 'domain', 'created_at', 'storage_limit_gb', 'user_limit']
 
@@ -47,10 +47,16 @@ class TenantRegistrationSerializer(serializers.Serializer):
         return value
 
     def create(self, validated_data):
-        # 1. Create Tenant
+        from datetime import date, timedelta
+
+        # Plan pricing map
+        PLAN_PRICES = {'starter': 99.00, 'growth': 299.00, 'enterprise': 999.00}
+
+        # 1. Create Tenant (starts as unpaid)
         tenant = Tenant.objects.create(
             name=validated_data['company_name'],
             plan=validated_data['plan'],
+            payment_status='unpaid',
         )
 
         # 2. Create Admin user for this Tenant
@@ -60,6 +66,14 @@ class TenantRegistrationSerializer(serializers.Serializer):
             password=validated_data['password'],
             tenant=tenant,
             role='admin',
+        )
+
+        # 3. Auto-create the activation invoice
+        Invoice.objects.create(
+            tenant=tenant,
+            amount=PLAN_PRICES.get(validated_data['plan'], 99.00),
+            due_date=date.today() + timedelta(days=7),
+            status='pending',
         )
 
         return tenant, user

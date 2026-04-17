@@ -11,6 +11,7 @@ import Documents from './pages/Documents';
 import Editor    from './pages/Editor';
 import Settings  from './pages/Settings';
 import PaymentWall from './pages/PaymentWall';
+import Team      from './pages/Team';
 
 import './index.css';
 
@@ -75,6 +76,7 @@ const AppContent = () => (
     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
     <Route path="/billing"   element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
     <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+    <Route path="/team"      element={<ProtectedRoute><Team /></ProtectedRoute>} />
     <Route path="/settings"  element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
     {/* Collaborative Editor */}

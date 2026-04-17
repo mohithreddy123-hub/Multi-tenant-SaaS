@@ -84,6 +84,9 @@ const Dashboard = () => {
           <Link to="/editor/0" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
             ✏️ Collab Editor
           </Link>
+          <Link to="/team" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
+            👥 Team
+          </Link>
           <Link to="/settings" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
             ⚙️ Settings
           </Link>

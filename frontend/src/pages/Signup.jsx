@@ -148,7 +148,7 @@ const Signup = () => {
             {step === 1 ? '🏢 Create your Workspace' : step === 2 ? '🔐 Secure your Account' : '🚀 Ready to Launch'}
           </h1>
           <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-            {step === 1 ? 'Start your company's isolated SaaS environment.' :
+            {step === 1 ? "Start your company's isolated SaaS environment." :
              step === 2 ? 'Set your admin credentials. Keep your password safe.' :
              'Review your plan and complete your first payment to activate.'}
           </p>

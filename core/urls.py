@@ -12,6 +12,7 @@ from .views import (
     DocumentListView,
     DocumentUploadView,
     DocumentDownloadView,
+    DocumentPreviewView,
     DocumentVersionListView,
     DocumentRollbackView,
     DocumentAnalyticsView,
@@ -45,6 +46,7 @@ urlpatterns = [
     path('documents/',                           DocumentListView.as_view(),        name='document-list'),
     path('documents/upload/',                    DocumentUploadView.as_view(),      name='document-upload'),
     path('documents/<int:pk>/download/',         DocumentDownloadView.as_view(),    name='document-download'),
+    path('documents/<int:pk>/preview/',          DocumentPreviewView.as_view(),     name='document-preview'),
 
     # Documents — Versioning
     path('documents/<int:pk>/versions/',                         DocumentVersionListView.as_view(), name='document-versions'),

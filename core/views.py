@@ -20,4 +20,5 @@ from .views_documents import (                                          # noqa: 
     DocumentVersionListView,
     DocumentRollbackView,
     DocumentAnalyticsView,
+    DocumentDeleteView,
 )

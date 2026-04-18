@@ -262,3 +262,41 @@ class DocumentAnalyticsView(APIView):
             'downloads_count': analytics.downloads_count,
             'edits_count': analytics.edits_count,
         })
+
+
+class DocumentDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        # RBAC: only admins may permanently delete documents
+        if request.user.role != 'admin':
+            return Response({'detail': 'Only admins can delete documents.'}, status=403)
+
+        try:
+            doc = Document.objects.get(id=pk, tenant=request.user.tenant)
+        except Document.DoesNotExist:
+            return Response({'detail': 'Document not found.'}, status=404)
+
+        doc_id = doc.id
+        doc_title = doc.title
+
+        # Delete the document (Django will handle deleting associated versions and analytics due to CASCADE)
+        doc.delete()
+
+        # Log deletion
+        AuditLog.objects.create(
+            tenant=request.user.tenant, user=request.user,
+            action='DELETE',
+            detail=f'Deleted document {doc_title}'
+        )
+
+        # Broadcast deletion to dashboard so all users see it disappear
+        try:
+            _broadcast_dashboard_update(str(request.user.tenant.id), 'document_deleted', {
+                'doc_id': doc_id,
+            })
+        except Exception:
+            pass
+
+        return Response({'message': f'Document "{doc_title}" deleted successfully.'}, status=200)
+

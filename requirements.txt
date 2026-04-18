@@ -8,3 +8,4 @@ djangorestframework
 djangorestframework-simplejwt
 sqlparse
 tzdata
+psycopg2-binary

@@ -116,6 +116,16 @@ const Documents = () => {
     }
   };
 
+  const handleDelete = async (doc) => {
+    if (!window.confirm(`Are you sure you want to permanently delete "${doc.title}"? This cannot be undone.`)) return;
+    try {
+      await api.delete(`/documents/${doc.id}/`);
+      // No need to fetchDocuments() immediately because WebSocket will trigger it
+    } catch (err) {
+      alert(err.response?.data?.detail || 'Failed to delete document.');
+    }
+  };
+
   const openVersionModal = (doc) => setVersionModal({ doc });
 
   const handleRollback = async (doc, versionNumber) => {
@@ -313,6 +323,10 @@ const Documents = () => {
                           onClick={() => openVersionModal(doc)}>🕒 Versions</button>
                         <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#34d399', borderColor: 'rgba(52,211,153,0.4)' }}
                           onClick={() => openAnalyticsModal(doc)}>📈 Analytics</button>
+                        {user?.role === 'admin' && (
+                          <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#ef4444', borderColor: 'rgba(239,68,68,0.4)' }}
+                            onClick={() => handleDelete(doc)}>🗑️ Delete</button>
+                        )}
                       </div>
                     </td>
                   </tr>

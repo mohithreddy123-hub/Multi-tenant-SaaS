@@ -98,9 +98,21 @@ const Documents = () => {
       const link = document.createElement('a');
       link.href = url; link.setAttribute('download', doc.original_filename);
       document.body.appendChild(link); link.click(); link.parentNode.removeChild(link);
-      fetchDocuments(); // refresh analytics counts
+      fetchDocuments();
     } catch (err) {
       alert('Failed to download document.');
+    }
+  };
+
+  const handlePreview = async (doc) => {
+    try {
+      const res = await api.get(`/documents/${doc.id}/preview/`, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: doc.file_type || 'application/octet-stream' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      fetchDocuments(); // refresh view count
+    } catch (err) {
+      alert('Could not preview this file. Try downloading it instead.');
     }
   };
 
@@ -293,6 +305,8 @@ const Documents = () => {
                     </td>
                     <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                        <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#c4b5fd', borderColor: 'rgba(196,181,253,0.4)' }}
+                          onClick={() => handlePreview(doc)}>👁 View</button>
                         <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem' }}
                           onClick={() => handleDownload(doc)}>⬇️ Download</button>
                         <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#a5b4fc', borderColor: 'rgba(99,102,241,0.4)' }}

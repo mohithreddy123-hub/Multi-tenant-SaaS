@@ -175,3 +175,16 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Use Redis in production
     }
 }
+
+# ─────────────────────────────────────────────
+# Celery — Background Task Queue
+# ─────────────────────────────────────────────
+# Requires Redis running on localhost:6379
+# Windows: install Memurai from https://www.memurai.com/
+# Mac/Linux: brew install redis  OR  sudo apt install redis-server
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE

@@ -27,26 +27,49 @@ const Dashboard = () => {
   }, []);
 
   // ── Real-time WebSocket connection ──
+  // Real-time WebSocket — with auto-reconnect (Fix 3)
   useEffect(() => {
     if (!user?.tenant?.id) return;
-    const tenantId = user.tenant.id;
-    const ws = new WebSocket(`ws://localhost:8000/ws/tenant/${tenantId}/`);
-    wsRef.current = ws;
+    let retryCount = 0;
+    const maxRetries = 5;
+    let retryTimer = null;
+    let unmounted = false;
 
-    ws.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
-      if (msg.event === 'document_uploaded' || msg.event === 'document_deleted') {
-        // Show live notification banner
-        setLiveEvent(msg);
-        setTimeout(() => setLiveEvent(null), 4000);
-        // Silently refresh dashboard stats
-        fetchDashboard();
-      }
+    const connect = () => {
+      const tenantId = user.tenant.id;
+      const wsBase = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws';
+      const ws = new WebSocket(`${wsBase}/tenant/${tenantId}/`);
+      wsRef.current = ws;
+
+      ws.onmessage = (e) => {
+        const msg = JSON.parse(e.data);
+        if (msg.event === 'document_uploaded' || msg.event === 'document_deleted') {
+          setLiveEvent(msg);
+          setTimeout(() => setLiveEvent(null), 4000);
+          fetchDashboard();
+        }
+      };
+
+      ws.onopen = () => { retryCount = 0; };
+
+      ws.onclose = () => {
+        if (unmounted) return;
+        if (retryCount < maxRetries) {
+          retryCount++;
+          const delay = Math.min(1000 * Math.pow(2, retryCount), 30000);
+          retryTimer = setTimeout(connect, delay);
+        }
+      };
+
+      ws.onerror = () => ws.close();
     };
 
-    ws.onerror = () => console.warn('Dashboard WebSocket unavailable.');
-
-    return () => ws.close();
+    connect();
+    return () => {
+      unmounted = true;
+      if (retryTimer) clearTimeout(retryTimer);
+      if (wsRef.current) wsRef.current.close();
+    };
   }, [user]);
 
   const handleLogout = () => {

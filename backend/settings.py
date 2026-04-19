@@ -219,6 +219,8 @@ CHANNEL_LAYERS = {
 # ─────────────────────────────────────────────
 # Web service start command:    daphne -b 0.0.0.0 -p $PORT backend.asgi:application
 # Worker start command:         celery -A backend worker --loglevel=info --pool=solo
+import ssl
+
 CELERY_BROKER_URL = env('REDIS_URL')
 CELERY_RESULT_BACKEND = env('REDIS_URL')
 CELERY_ACCEPT_CONTENT = ['json']
@@ -227,3 +229,10 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 # Fix 4: Reduce Redis usage — tasks expire after 1 hour
 CELERY_RESULT_EXPIRES = 3600
+# Upstash uses rediss:// (TLS) — ssl.CERT_NONE skips cert verification (required for Upstash free tier)
+CELERY_BROKER_USE_SSL = {
+    'ssl_cert_reqs': ssl.CERT_NONE
+}
+CELERY_REDIS_BACKEND_USE_SSL = {
+    'ssl_cert_reqs': ssl.CERT_NONE
+}

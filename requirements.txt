@@ -9,3 +9,5 @@ djangorestframework-simplejwt
 sqlparse
 tzdata
 psycopg2-binary
+celery
+redis

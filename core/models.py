@@ -127,14 +127,24 @@ class Document(models.Model):
     """
     Represents a file uploaded by a user (stored encrypted on disk).
     """
+    STATUS_CHOICES = [
+        ('pending', 'Pending Encryption'),
+        ('ready',   'Ready'),
+        ('failed',  'Encryption Failed'),
+    ]
+
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='documents')
     uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='documents')
     title = models.CharField(max_length=255)
     original_filename = models.CharField(max_length=255)
     file_type = models.CharField(max_length=100, blank=True)   # MIME type
     file_size = models.PositiveIntegerField(default=0)          # bytes
-    # The actual data is stored as encrypted bytes in a FileField
-    encrypted_file = models.FileField(upload_to='encrypted_docs/%Y/%m/')
+    # The encrypted data (filled by the Celery task after upload)
+    encrypted_file = models.FileField(upload_to='encrypted_docs/%Y/%m/', blank=True)
+    # Temporary raw file — deleted once Celery finishes encrypting
+    raw_file = models.FileField(upload_to='temp_uploads/%Y/%m/', null=True, blank=True)
+    # Processing state — 'pending' until Celery finishes, then 'ready'
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ready')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

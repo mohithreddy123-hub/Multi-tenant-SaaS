@@ -11,27 +11,34 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+import environ
+import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Initialize environ
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+
+# Set the project base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Take environment variables from .env file (ignored in production — env vars set directly on server)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-pyci1h9zcajt6&xp@ao#0t*33x%nffsc^z)8mnohbaf*l7fny@'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+# ─────────────────────────────────────────────
+# Core Security Settings
+# ─────────────────────────────────────────────
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env('DEBUG')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 
 
-# Application definition
-
+# ─────────────────────────────────────────────
+# Application Definition
+# ─────────────────────────────────────────────
 INSTALLED_APPS = [
-    'daphne',  # Must be FIRST to replace runserver with ASGI
+    'daphne',                           # FIRST — enables ASGI/WebSocket support
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,13 +50,16 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'channels',
+    'cloudinary',                       # Fix 2: Cloud file storage
+    'cloudinary_storage',               # Fix 2: Replaces local /media/ folder
     # Local
     'core',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',    # Fix 5: Serve static files in production
+    'corsheaders.middleware.CorsMiddleware',         # Fix 6: Must be before CommonMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -78,67 +88,91 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+# ─────────────────────────────────────────────
+# Database — Fix 8: Use Neon pooled connection
+# ─────────────────────────────────────────────
+# Local: postgres://postgres:1234@localhost:5432/multi_tenant_db
+# Neon:  postgresql://user:pass@ep-xxx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'multi_tenant_db',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': env.db(),
 }
+# Enable connection pooling to prevent Neon free-tier timeouts
+DATABASES['default']['CONN_MAX_AGE'] = 60
+DATABASES['default']['OPTIONS'] = DATABASES['default'].get('OPTIONS', {})
+DATABASES['default']['OPTIONS']['connect_timeout'] = 10
 
 
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
-
+# ─────────────────────────────────────────────
+# Password Validation
+# ─────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
+# ─────────────────────────────────────────────
 # Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
-
+# ─────────────────────────────────────────────
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
+# ─────────────────────────────────────────────
+# Static Files — Fix 5: Whitenoise for production
+# ─────────────────────────────────────────────
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-STATIC_URL = 'static/'
 
-# Default primary key field type
+# ─────────────────────────────────────────────
+# File Storage — Fix 2: Cloudinary (free 25GB)
+# ─────────────────────────────────────────────
+# Local development: files saved to /media/
+# Production: files saved to Cloudinary (free tier — no AWS needed)
+CLOUDINARY_URL = env('CLOUDINARY_URL', default='')
+if CLOUDINARY_URL:
+    # Production: use Cloudinary for all file uploads
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.RawMediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
+else:
+    # Local development: use local filesystem
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# ─────────────────────────────────────────────
+# Default Primary Key
+# ─────────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model
 AUTH_USER_MODEL = 'core.User'
 
-# CORS — allow React dev server
-CORS_ALLOW_ALL_ORIGINS = True
 
+# ─────────────────────────────────────────────
+# CORS — Fix 6: Whitelist Vercel domain
+# ─────────────────────────────────────────────
+# In DEBUG mode, allow all origins (for local development)
+# In production, only allow the specific Vercel domain
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = env.list(
+        'CORS_ALLOWED_ORIGINS',
+        default=['http://localhost:5173']
+    )
+    CORS_ALLOW_CREDENTIALS = True
+
+
+# ─────────────────────────────────────────────
 # Django REST Framework
+# ─────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -149,42 +183,47 @@ REST_FRAMEWORK = {
 }
 
 # JWT Settings
-from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=8),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# Email (console backend for development)
+
+# ─────────────────────────────────────────────
+# Email
+# ─────────────────────────────────────────────
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@saasplatform.com'
 
-# File Storage (for encrypted documents)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
-# Document Encryption Key (Fernet)
-# IMPORTANT: In production, store this in an environment variable, NOT in code!
-DOCUMENT_ENCRYPTION_KEY = 'csx7vO4SFnRxOxDbcGO8LCMdNuz1Jmf4k868PZNkLx0='
+# ─────────────────────────────────────────────
+# Document Encryption Key (Fernet AES-128)
+# ─────────────────────────────────────────────
+DOCUMENT_ENCRYPTION_KEY = env('DOCUMENT_ENCRYPTION_KEY')
 
+
+# ─────────────────────────────────────────────
 # Django Channels (WebSockets)
+# ─────────────────────────────────────────────
 ASGI_APPLICATION = 'backend.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Use Redis in production
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Use Redis channel layer in production
     }
 }
 
+
 # ─────────────────────────────────────────────
-# Celery — Background Task Queue
+# Celery — Fix 1: Separate Web + Worker on Render
 # ─────────────────────────────────────────────
-# Requires Redis running on localhost:6379
-# Windows: install Memurai from https://www.memurai.com/
-# Mac/Linux: brew install redis  OR  sudo apt install redis-server
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# Web service start command:    daphne -b 0.0.0.0 -p $PORT backend.asgi:application
+# Worker start command:         celery -A backend worker --loglevel=info --pool=solo
+CELERY_BROKER_URL = env('REDIS_URL')
+CELERY_RESULT_BACKEND = env('REDIS_URL')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+# Fix 4: Reduce Redis usage — tasks expire after 1 hour
+CELERY_RESULT_EXPIRES = 3600

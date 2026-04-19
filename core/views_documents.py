@@ -13,7 +13,7 @@ from channels.layers import get_channel_layer
 
 from .models import Document, DocumentVersion, AuditLog, FileAnalytics
 from .serializers import DocumentSerializer, DocumentVersionSerializer
-from .utils.encryption import encrypt_bytes, decrypt_bytes
+from .utils.encryption import decrypt_bytes
 
 # ── Per-file upload cap (Issue 2 + 4: memory bound) ──
 MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024  # 100 MB
@@ -71,11 +71,11 @@ class DocumentUploadView(APIView):
 
         uploaded_file = request.FILES['file']
 
-        # Issue 2: Validate size BEFORE reading into memory
+        # Validate size BEFORE reading into memory
         if uploaded_file.size > MAX_FILE_SIZE_BYTES:
             return Response({'detail': 'File exceeds the 100 MB per-file limit.'}, status=400)
 
-        # Issue 3: Backend MIME type whitelist
+        # Backend MIME type whitelist
         file_mime = (uploaded_file.content_type or 'application/octet-stream').split(';')[0].strip()
         if file_mime not in ALLOWED_MIME_TYPES:
             return Response({'detail': f'File type "{file_mime}" is not permitted.'}, status=400)
@@ -86,38 +86,28 @@ class DocumentUploadView(APIView):
         if used_storage_bytes + uploaded_file.size > limit_bytes:
             return Response({'detail': f'Storage limit exceeded ({tenant.storage_limit_gb} GB).'}, status=400)
 
-        raw_bytes = uploaded_file.read()
-        encrypted_bytes = encrypt_bytes(raw_bytes)
-
+        # ── Create the Document record immediately (fast — no crypto yet) ──
         doc = Document(
             tenant=tenant,
             uploaded_by=user,
             title=request.POST.get('title', uploaded_file.name),
             original_filename=uploaded_file.name,
             file_type=file_mime,
-            file_size=uploaded_file.size
+            file_size=uploaded_file.size,
+            status='pending',   # Will become 'ready' once Celery finishes
         )
-        doc.encrypted_file.save(uploaded_file.name, ContentFile(encrypted_bytes), save=False)
         doc.save()
 
-        version = DocumentVersion(document=doc, version_number=1, created_by=user)
-        version.encrypted_file.save(uploaded_file.name, ContentFile(encrypted_bytes), save=False)
-        version.save()
+        # ── Save the raw file to a temp field — fast disk write, no encryption ──
+        raw_bytes = uploaded_file.read()
+        doc.raw_file.save(uploaded_file.name, ContentFile(raw_bytes), save=True)
 
-        FileAnalytics.objects.create(document=doc)
-        AuditLog.objects.create(
-            tenant=tenant, user=user, action='UPLOAD', document=doc,
-            detail=f'Uploaded {doc.original_filename} ({doc.file_size} bytes)'
-        )
+        # ── Fire the background task — encryption happens off the web thread ──
+        from .tasks import encrypt_and_finalize_document
+        encrypt_and_finalize_document.delay(doc.id)
 
-        try:
-            _broadcast_dashboard_update(str(tenant.id), 'document_uploaded', {
-                'doc_id': doc.id, 'doc_title': doc.title, 'uploader': user.username,
-            })
-        except Exception:
-            pass
-
-        return Response(DocumentSerializer(doc).data, status=status.HTTP_201_CREATED)
+        # ── Return 202 Accepted immediately — user sees "Processing" badge ──
+        return Response(DocumentSerializer(doc).data, status=status.HTTP_202_ACCEPTED)
 
 
 class DocumentDownloadView(APIView):
@@ -130,6 +120,11 @@ class DocumentDownloadView(APIView):
             doc = Document.objects.get(id=pk, tenant=request.user.tenant)
         except Document.DoesNotExist:
             return Response({'detail': 'Document not found.'}, status=404)
+
+        if doc.status == 'pending':
+            return Response({'detail': 'This file is still being encrypted. Please wait a moment.'}, status=409)
+        if doc.status == 'failed':
+            return Response({'detail': 'Encryption failed for this file. Please re-upload.'}, status=500)
 
         try:
             with doc.encrypted_file.open('rb') as f:
@@ -162,6 +157,11 @@ class DocumentPreviewView(APIView):
             doc = Document.objects.get(id=pk, tenant=request.user.tenant)
         except Document.DoesNotExist:
             return Response({'detail': 'Document not found.'}, status=404)
+
+        if doc.status == 'pending':
+            return Response({'detail': 'This file is still being encrypted. Please wait a moment.'}, status=409)
+        if doc.status == 'failed':
+            return Response({'detail': 'Encryption failed for this file. Please re-upload.'}, status=500)
 
         try:
             with doc.encrypted_file.open('rb') as f:

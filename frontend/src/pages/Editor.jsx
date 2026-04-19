@@ -40,45 +40,55 @@ const Editor = () => {
       }).catch(() => {});
     }
 
-    // Open WebSocket to editor room
+    // Open WebSocket to editor room — with auto-reconnect (Fix 3)
     const id = docId || '0';
-    const ws = new WebSocket(`ws://localhost:8000/ws/editor/${id}/`);
-    wsRef.current = ws;
+    let retryCount = 0;
+    const maxRetries = 5;
+    let retryTimer = null;
+    let unmounted = false;
 
-    ws.onopen = () => {
-      setConnected(true);
-      ws.send(JSON.stringify({ event: 'user_join', username: selfUsername }));
+    const connect = () => {
+      const wsBase = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws';
+      const ws = new WebSocket(`${wsBase}/editor/${id}/`);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        retryCount = 0;
+        setConnected(true);
+        ws.send(JSON.stringify({ event: 'user_join', username: selfUsername }));
+      };
+
+      ws.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        if (data.event === 'text_change' && data.username !== selfUsername) setText(data.content);
+        if (data.event === 'user_join' && data.username !== selfUsername)
+          setActiveUsers(prev => [...new Set([...prev, data.username])]);
+        if (data.event === 'user_leave') {
+          setActiveUsers(prev => prev.filter(u => u !== data.username));
+          setCursors(prev => { const n = { ...prev }; delete n[data.username]; return n; });
+        }
+        if (data.event === 'cursor_move' && data.username !== selfUsername)
+          setCursors(prev => ({ ...prev, [data.username]: { top: data.top, left: data.left, color: getColor(data.username) } }));
+      };
+
+      ws.onclose = () => {
+        setConnected(false);
+        if (unmounted) return;
+        if (retryCount < maxRetries) {
+          retryCount++;
+          const delay = Math.min(1000 * Math.pow(2, retryCount), 30000);
+          retryTimer = setTimeout(connect, delay);
+        }
+      };
+
+      ws.onerror = () => ws.close();
     };
 
-    ws.onmessage = (e) => {
-      const data = JSON.parse(e.data);
-
-      if (data.event === 'text_change' && data.username !== selfUsername) {
-        setText(data.content);
-      }
-
-      if (data.event === 'user_join' && data.username !== selfUsername) {
-        setActiveUsers(prev => [...new Set([...prev, data.username])]);
-      }
-
-      if (data.event === 'user_leave') {
-        setActiveUsers(prev => prev.filter(u => u !== data.username));
-        setCursors(prev => { const n = { ...prev }; delete n[data.username]; return n; });
-      }
-
-      if (data.event === 'cursor_move' && data.username !== selfUsername) {
-        setCursors(prev => ({
-          ...prev,
-          [data.username]: { top: data.top, left: data.left, color: getColor(data.username) }
-        }));
-      }
-    };
-
-    ws.onclose = () => setConnected(false);
-    ws.onerror = () => setConnected(false);
-
+    connect();
     return () => {
-      ws.close();
+      unmounted = true;
+      if (retryTimer) clearTimeout(retryTimer);
+      if (wsRef.current) wsRef.current.close();
       setConnected(false);
     };
   }, [docId]);

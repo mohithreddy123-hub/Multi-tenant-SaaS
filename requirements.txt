@@ -11,3 +11,7 @@ tzdata
 psycopg2-binary
 celery
 redis
+django-environ
+whitenoise
+cloudinary
+django-cloudinary-storage

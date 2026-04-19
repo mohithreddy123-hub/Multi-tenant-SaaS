@@ -43,24 +43,51 @@ const Documents = () => {
 
   useEffect(() => { fetchDocuments(); }, []);
 
-  // Real-time WebSocket
+  // Real-time WebSocket — with auto-reconnect (Fix 3)
   useEffect(() => {
     if (!user?.tenant?.id) return;
-    const ws = new WebSocket(`ws://localhost:8000/ws/tenant/${user.tenant.id}/`);
-    wsRef.current = ws;
-    ws.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
-      if (
-        msg.event === 'document_uploaded' ||
-        msg.event === 'document_ready' ||
-        msg.event === 'document_deleted'
-      ) {
-        fetchDocuments();
-      }
+    let retryCount = 0;
+    const maxRetries = 5;
+    let retryTimer = null;
+    let unmounted = false;
+
+    const connect = () => {
+      const wsBase = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws';
+      const ws = new WebSocket(`${wsBase}/tenant/${user.tenant.id}/`);
+      wsRef.current = ws;
+
+      ws.onmessage = (e) => {
+        const msg = JSON.parse(e.data);
+        if (
+          msg.event === 'document_uploaded' ||
+          msg.event === 'document_ready' ||
+          msg.event === 'document_deleted'
+        ) {
+          fetchDocuments();
+        }
+      };
+
+      ws.onopen = () => { retryCount = 0; };  // Reset counter on successful connection
+
+      ws.onclose = () => {
+        if (unmounted) return;
+        if (retryCount < maxRetries) {
+          retryCount++;
+          const delay = Math.min(1000 * Math.pow(2, retryCount), 30000); // Exponential backoff, max 30s
+          retryTimer = setTimeout(connect, delay);
+        }
+      };
+
+      ws.onerror = () => ws.close();
     };
-    ws.onerror = () => {};
-    return () => ws.close();
-  }, [user]);
+
+    connect();
+    return () => {
+      unmounted = true;
+      if (retryTimer) clearTimeout(retryTimer);
+      if (wsRef.current) wsRef.current.close();
+    };
+  }, [user?.tenant?.id]);
 
   const fetchDocuments = async () => {
     try {

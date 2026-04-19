@@ -50,7 +50,11 @@ const Documents = () => {
     wsRef.current = ws;
     ws.onmessage = (e) => {
       const msg = JSON.parse(e.data);
-      if (msg.event === 'document_uploaded' || msg.event === 'document_deleted') {
+      if (
+        msg.event === 'document_uploaded' ||
+        msg.event === 'document_ready' ||
+        msg.event === 'document_deleted'
+      ) {
         fetchDocuments();
       }
     };
@@ -314,20 +318,37 @@ const Documents = () => {
                       </span>
                     </td>
                     <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                        <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#c4b5fd', borderColor: 'rgba(196,181,253,0.4)' }}
-                          onClick={() => handlePreview(doc)}>👁 View</button>
-                        <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem' }}
-                          onClick={() => handleDownload(doc)}>⬇️ Download</button>
-                        <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#a5b4fc', borderColor: 'rgba(99,102,241,0.4)' }}
-                          onClick={() => openVersionModal(doc)}>🕒 Versions</button>
-                        <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#34d399', borderColor: 'rgba(52,211,153,0.4)' }}
-                          onClick={() => openAnalyticsModal(doc)}>📈 Analytics</button>
-                        {user?.role === 'admin' && (
-                          <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#ef4444', borderColor: 'rgba(239,68,68,0.4)' }}
-                            onClick={() => handleDelete(doc)}>🗑️ Delete</button>
-                        )}
-                      </div>
+                       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                         {doc.status === 'pending' && (
+                           <span style={{
+                             background: 'rgba(245,158,11,0.15)', color: '#f59e0b',
+                             padding: '0.3rem 0.8rem', borderRadius: '999px',
+                             fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem'
+                           }}>
+                             <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⏳</span> Encrypting...
+                           </span>
+                         )}
+                         {doc.status === 'failed' && (
+                           <span style={{
+                             background: 'rgba(239,68,68,0.15)', color: '#ef4444',
+                             padding: '0.3rem 0.8rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 600
+                           }}>❌ Failed — Re-upload</span>
+                         )}
+                         {doc.status === 'ready' && (<>
+                           <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#c4b5fd', borderColor: 'rgba(196,181,253,0.4)' }}
+                             onClick={() => handlePreview(doc)}>👁 View</button>
+                           <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem' }}
+                             onClick={() => handleDownload(doc)}>⬇️ Download</button>
+                           <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#a5b4fc', borderColor: 'rgba(99,102,241,0.4)' }}
+                             onClick={() => openVersionModal(doc)}>🕒 Versions</button>
+                           <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#34d399', borderColor: 'rgba(52,211,153,0.4)' }}
+                             onClick={() => openAnalyticsModal(doc)}>📈 Analytics</button>
+                           {user?.role === 'admin' && (
+                             <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#ef4444', borderColor: 'rgba(239,68,68,0.4)' }}
+                               onClick={() => handleDelete(doc)}>🗑️ Delete</button>
+                           )}
+                         </>)}
+                       </div>
                     </td>
                   </tr>
                 ))}

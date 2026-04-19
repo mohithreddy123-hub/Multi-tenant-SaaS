@@ -1,0 +1,66 @@
+# render.yaml — Render.com deployment configuration
+# This file tells Render how to deploy TenantVault for FREE.
+#
+# Services created:
+#   1. tenantvault-api    (Web Service — Django/Daphne)
+#   2. tenantvault-worker (Background Worker — Celery)
+#
+# Both share the same environment variables set in the Render dashboard.
+
+services:
+
+  # ─────────────────────────────────────────────
+  # 1. Web Service — Django + Daphne (ASGI)
+  # ─────────────────────────────────────────────
+  - type: web
+    name: tenantvault-api
+    env: python
+    region: singapore   # Closest free region to India
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "daphne -b 0.0.0.0 -p $PORT backend.asgi:application"
+    envVars:
+      - key: SECRET_KEY
+        sync: false       # You will set this manually in Render dashboard
+      - key: DATABASE_URL
+        sync: false       # Neon pooled connection string
+      - key: REDIS_URL
+        sync: false       # Upstash Redis URL
+      - key: DOCUMENT_ENCRYPTION_KEY
+        sync: false       # Your Fernet encryption key
+      - key: CLOUDINARY_URL
+        sync: false       # Your Cloudinary URL (free 25GB)
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false       # Your Vercel frontend URL e.g. https://tenantvault.vercel.app
+      - key: ALLOWED_HOSTS
+        sync: false       # ⚠️ REQUIRED: set to your-backend.onrender.com (no https://)
+      - key: DEBUG
+        value: "False"    # IMPORTANT: Always False in production
+      - key: DJANGO_SETTINGS_MODULE
+        value: backend.settings
+
+  # ─────────────────────────────────────────────
+  # 2. Background Worker — Celery (Fix 1)
+  # ─────────────────────────────────────────────
+  - type: worker
+    name: tenantvault-worker
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "celery -A backend worker --loglevel=info --pool=solo"
+    envVars:
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: DOCUMENT_ENCRYPTION_KEY
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: DEBUG
+        value: "False"
+      - key: DJANGO_SETTINGS_MODULE
+        value: backend.settings

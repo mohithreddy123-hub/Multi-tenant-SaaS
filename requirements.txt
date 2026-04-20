@@ -15,3 +15,4 @@ django-environ
 whitenoise
 cloudinary
 django-cloudinary-storage
+channels-redis

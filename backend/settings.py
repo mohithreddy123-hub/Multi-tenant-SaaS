@@ -206,12 +206,36 @@ DOCUMENT_ENCRYPTION_KEY = env('DOCUMENT_ENCRYPTION_KEY')
 # ─────────────────────────────────────────────
 # Django Channels (WebSockets)
 # ─────────────────────────────────────────────
+# CRITICAL: Must use RedisChannelLayer in production.
+# InMemoryChannelLayer ONLY works in a single process — broken on Render.
+# RedisChannelLayer uses Upstash so web + worker can share WebSocket state.
 ASGI_APPLICATION = 'backend.asgi.application'
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Use Redis channel layer in production
+
+_redis_url = env('REDIS_URL')
+
+if _redis_url.startswith('rediss://'):
+    # Upstash TLS Redis — must pass ssl_cert_reqs
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [{
+                    'address': _redis_url,
+                    'ssl_cert_reqs': None,
+                }],
+            },
+        }
     }
-}
+else:
+    # Local Redis (no TLS)
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [_redis_url],
+            },
+        }
+    }
 
 
 # ─────────────────────────────────────────────

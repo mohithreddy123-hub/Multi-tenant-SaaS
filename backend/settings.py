@@ -163,9 +163,14 @@ AUTH_USER_MODEL = 'core.User'
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
+    # Use environment variable if set, otherwise fallback to these domains
     CORS_ALLOWED_ORIGINS = env.list(
         'CORS_ALLOWED_ORIGINS',
-        default=['http://localhost:5173']
+        default=[
+            'http://localhost:5173',
+            'https://multi-tenant-saa-s-nine.vercel.app',
+            'https://multi-tenant-saa-lclwqhj3v-mohithreddy123-hubs-projects.vercel.app',
+        ]
     )
     CORS_ALLOW_CREDENTIALS = True
 

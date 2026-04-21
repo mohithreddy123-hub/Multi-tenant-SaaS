@@ -1,76 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* ── Backgrounds — 3 distinct layers ── */
-  --bg-base:        #07090f;
-  --bg-surface:     #0f1117;
-  --bg-elevated:    #161b27;
-  --bg-border:      #1e2535;
-
-  /* ── Legacy aliases (keep for backward compat) ── */
-  --bg-dark:        #07090f;
-  --bg-card:        #0f1117;
-  --border-light:   #1e2535;
-  --shadow-glow:    0 0 20px rgba(99, 102, 241, 0.4);
-
-  /* ── Brand colors ── */
-  --brand-primary:   #6366f1;
-  --brand-secondary: #06b6d4;
-  --brand-success:   #10b981;
-  --brand-warning:   #f59e0b;
-  --brand-danger:    #ef4444;
-
-  /* ── Legacy aliases ── */
-  --accent-success: #10b981;
-  --accent-error:   #ef4444;
-
-  /* ── Text hierarchy ── */
-  --text-primary:   #f1f5f9;
+  /* Dynamic, vibrant color palette */
+  --bg-dark: #0f172a;
+  --bg-card: #1e293b;
+  --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --text-muted:     #475569;
-  --text-accent:    #818cf8;
-
-  /* ── Sidebar ── */
-  --sidebar-bg:     #0b0e18;
-  --sidebar-border: #1a2035;
-  --sidebar-active: #1e2540;
-  --sidebar-hover:  #141929;
-
-  /* ── Buttons ── */
-  --btn-primary-bg:       #6366f1;
-  --btn-primary-hover:    #4f46e5;
-  --btn-secondary-bg:     transparent;
-  --btn-secondary-border: #2d3748;
-
-  /* ── Glass ── */
-  --glass-bg:     rgba(15, 17, 23, 0.85);
-  --glass-border: rgba(99, 102, 241, 0.15);
-  --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-}
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: var(--bg-border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--brand-primary); }
-
-/* ── Selection ── */
-::selection { background: rgba(99,102,241,0.3); color: var(--text-primary); }
-
-/* ── Focus ring ── */
-:focus-visible {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* ── Page fade-in ── */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.page-enter {
-  animation: fadeIn 0.25s ease forwards;
+  --brand-primary: #6366f1; /* Indigo */
+  --brand-secondary: #8b5cf6; /* Violet */
+  --accent-success: #10b981;
+  --accent-error: #ef4444;
+  --border-light: rgba(255, 255, 255, 0.1);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.4);
 }
 
 * {
@@ -80,8 +21,8 @@
 }
 
 body {
-  font-family: 'Outfit', 'Inter', sans-serif;
-  background-color: var(--bg-base);
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-dark);
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
@@ -160,70 +101,52 @@ p {
   background-size: 1em;
 }
 
-/* Buttons — Section 10 Standard */
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 10px 20px;
-  border-radius: 10px;
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
   font-weight: 500;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
   text-decoration: none;
 }
 
 .btn-primary {
-  background: var(--btn-primary-bg);
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
   color: white;
-  border: none;
+  position: relative;
+  overflow: hidden;
 }
-.btn-primary:hover { background: var(--btn-primary-hover); }
-.btn-primary:active { transform: scale(0.98); }
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
 
 .btn-secondary {
-  background: var(--btn-secondary-bg);
-  border: 1px solid var(--btn-secondary-border);
+  background: transparent;
+  border: 1px solid var(--border-light);
   color: var(--text-primary);
 }
+
 .btn-secondary:hover {
-  background: var(--bg-elevated);
-  border-color: rgba(99,102,241,0.4);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
 }
-
-.btn-danger {
-  background: transparent;
-  border: 1px solid var(--brand-danger);
-  color: var(--brand-danger);
-  border-radius: 10px;
-  padding: 10px 20px;
-  font-size: 14px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.15s;
-}
-.btn-danger:hover { background: rgba(239,68,68,0.08); }
-
-.btn-danger-sm {
-  background: transparent;
-  border: 1px solid var(--brand-danger);
-  color: var(--brand-danger);
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 13px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.15s;
-}
-.btn-danger-sm:hover { background: rgba(239,68,68,0.08); }
 
 .btn-block {
   width: 100%;
-  justify-content: center;
 }
 
 /* Utility Links */
@@ -288,45 +211,13 @@ p {
 }
 
 .sidebar {
-  width: 240px;
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--sidebar-border);
-  padding: 16px 0;
+  width: 260px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-light);
+  padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  flex-shrink: 0;
   transition: transform 0.3s ease-in-out;
-}
-
-/* Sidebar nav items */
-.sidebar-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  margin: 2px 8px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--text-secondary);
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.15s, color 0.15s;
-  width: calc(100% - 16px);
-  text-align: left;
-}
-.sidebar-nav-item:hover {
-  background: var(--sidebar-hover);
-  color: var(--text-primary);
-}
-.sidebar-nav-item.active {
-  background: var(--sidebar-active);
-  color: var(--text-accent);
-  font-weight: 500;
 }
 
 .main-content {

@@ -131,13 +131,12 @@ const Editor = () => {
           <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>{user?.tenant?.name || 'Workspace'}</h2>
           <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Editor</p>
         </div>
-        <nav style={{ flex: 1 }}>
-          <Link onClick={closeSidebar} to="/dashboard" className="sidebar-nav-item">📊 Dashboard</Link>
-          <Link onClick={closeSidebar} to="/billing" className="sidebar-nav-item">💳 Billing</Link>
-          <Link onClick={closeSidebar} to="/documents" className="sidebar-nav-item">📄 Documents</Link>
-          <button onClick={closeSidebar} className="sidebar-nav-item active">✏️ Collab Editor</button>
-          <Link onClick={closeSidebar} to="/team" className="sidebar-nav-item">👥 Team</Link>
-          <Link onClick={closeSidebar} to="/settings" className="sidebar-nav-item">⚙️ Settings</Link>
+        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
+          <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
+          <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
+          <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>✏️ Collab Editor</button>
+          <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }} disabled>⚙️ Settings</button>
         </nav>
 
         {/* Active collaborators */}
@@ -159,16 +158,13 @@ const Editor = () => {
           </div>
         </div>
 
-        <div style={{ marginTop: 'auto', borderTop: '1px solid var(--sidebar-border)', padding: '12px 16px' }}>
-          <div style={{ marginBottom: '8px' }}>
-            <p style={{ margin: 0, fontWeight: 500, fontSize: '13px', color: 'var(--text-primary)' }}>{user?.username}</p>
-            <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>{user?.role}</p>
+        <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <p style={{ margin: 0, fontWeight: 500, color: 'var(--text-primary)' }}>{user?.username}</p>
+            <p style={{ margin: 0, fontSize: '0.8rem' }}>{user?.role}</p>
           </div>
-          <button onClick={() => { logout(); navigate('/login'); }}
-            style={{ width: '100%', padding: '8px', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: 'var(--brand-danger)', background: 'transparent', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s' }}
-            onMouseEnter={e => e.target.style.background='rgba(239,68,68,0.08)'}
-            onMouseLeave={e => e.target.style.background='transparent'}
-          >
+          <button onClick={() => { logout(); navigate('/login'); }} className="btn btn-secondary btn-block"
+            style={{ borderColor: 'var(--accent-error)', color: 'var(--accent-error)' }}>
             Log Out
           </button>
         </div>
@@ -187,21 +183,20 @@ const Editor = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: connected ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
-              border: connected ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(239,68,68,0.3)',
-              color: connected ? 'var(--brand-success)' : 'var(--brand-danger)',
-              padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 500
+              background: connected ? 'rgba(52,211,153,0.1)' : 'rgba(239,68,68,0.1)',
+              color: connected ? 'var(--accent-success)' : 'var(--accent-error)',
+              padding: '0.4rem 0.9rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 500
             }}>
               <span style={{
                 width: 7, height: 7, borderRadius: '50%', display: 'inline-block',
-                background: connected ? 'var(--brand-success)' : 'var(--brand-danger)',
+                background: connected ? 'var(--accent-success)' : 'var(--accent-error)',
                 animation: connected ? 'pulse 2s infinite' : 'none'
               }}></span>
               {connected ? `Live · ${activeUsers.length + 1} online` : 'Disconnected'}
             </div>
             <div style={{
-              background: 'var(--bg-elevated)', border: '1px solid var(--bg-border)',
-              padding: '4px 12px', borderRadius: '20px', fontSize: '12px', color: 'var(--brand-secondary)'
+              background: 'rgba(255,255,255,0.05)', padding: '0.4rem 0.9rem',
+              borderRadius: '10px', fontSize: '0.8rem', color: 'var(--text-secondary)'
             }}>
               Room: doc-{docId || '0'}
             </div>
@@ -233,21 +228,21 @@ const Editor = () => {
             placeholder={`Start typing... Your changes sync live to everyone in this room.\n\nThis is a collaborative scratch pad. Open this URL in another browser tab to see real-time collaboration in action.`}
             style={{
               flex: 1,
-              minHeight: '400px',
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--bg-border)',
-              borderRadius: '12px',
-              padding: '20px',
+              minHeight: '500px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid var(--border-light)',
+              borderRadius: '16px',
+              padding: '2rem',
               color: 'var(--text-primary)',
-              fontSize: '15px',
+              fontSize: '1rem',
               lineHeight: '1.7',
               fontFamily: "'Inter', 'Segoe UI', sans-serif",
               resize: 'vertical',
               outline: 'none',
-              transition: 'border-color 0.15s',
+              transition: 'border-color 0.2s',
             }}
             onFocus={e => e.target.style.borderColor = 'var(--brand-primary)'}
-            onBlur={e => e.target.style.borderColor = 'var(--bg-border)'}
+            onBlur={e => e.target.style.borderColor = 'var(--border-light)'}
           />
         </div>
 

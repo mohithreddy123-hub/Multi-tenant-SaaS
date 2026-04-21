@@ -152,30 +152,28 @@ const Settings = () => {
             <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
             {/* ── Sidebar ── */}
             <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-                <div style={{ padding: '8px 16px 4px' }}>
-                    <p style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>TenantVault</p>
-                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)', paddingBottom: '16px' }}>Account Settings</p>
+                <div style={{ marginBottom: '2rem' }}>
+                    <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>TenantVault</h2>
+                    <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Account Settings</p>
                 </div>
 
-                <nav style={{ flex: 1 }}>
-                    <Link onClick={closeSidebar} to="/dashboard" className="sidebar-nav-item">📊 Dashboard</Link>
-                    <Link onClick={closeSidebar} to="/billing" className="sidebar-nav-item">💳 Billing</Link>
-                    <Link onClick={closeSidebar} to="/documents" className="sidebar-nav-item">📄 Documents</Link>
-                    <Link onClick={closeSidebar} to="/editor/0" className="sidebar-nav-item">✏️ Collab Editor</Link>
-                    <Link onClick={closeSidebar} to="/team" className="sidebar-nav-item">👥 Team</Link>
-                    <button onClick={closeSidebar} className="sidebar-nav-item active">⚙️ Settings</button>
+                <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
+                    <Link onClick={closeSidebar} to="/billing"   className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
+                    <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
+                    <Link onClick={closeSidebar} to="/editor/0"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
+                    <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(99,102,241,0.15)', color: 'var(--brand-primary)' }}>
+                        ⚙️ Settings
+                    </button>
                 </nav>
 
-                <div style={{ marginTop: 'auto', borderTop: '1px solid var(--sidebar-border)', padding: '12px 16px' }}>
-                    <div style={{ marginBottom: '8px' }}>
-                        <p style={{ margin: 0, fontWeight: 500, fontSize: '13px', color: 'var(--text-primary)' }}>{user?.username}</p>
-                        <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>{user?.role}</p>
+                <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
+                    <div style={{ marginBottom: '1rem' }}>
+                        <p style={{ margin: 0, fontWeight: 500, color: 'var(--text-primary)' }}>{user?.username}</p>
+                        <p style={{ margin: 0, fontSize: '0.8rem' }}>{user?.role}</p>
                     </div>
-                    <button onClick={() => { logout(); navigate('/login'); }}
-                        style={{ width: '100%', padding: '8px', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: 'var(--brand-danger)', background: 'transparent', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s', marginTop: '8px' }}
-                        onMouseEnter={e => e.target.style.background='rgba(239,68,68,0.08)'}
-                        onMouseLeave={e => e.target.style.background='transparent'}
-                    >
+                    <button onClick={() => { logout(); navigate('/login'); }} className="btn btn-secondary btn-block"
+                        style={{ borderColor: 'var(--accent-error)', color: 'var(--accent-error)' }}>
                         Log Out
                     </button>
                 </div>

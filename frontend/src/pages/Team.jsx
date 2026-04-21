@@ -183,32 +183,30 @@ const Team = () => {
   const totalSlots = teamData?.user_limit ?? 5;
   const slotsLeft = teamData?.slots_remaining ?? 0;
   const slotPercent = Math.round((usedSlots / totalSlots) * 100);
-  const slotColor = slotPercent >= 90 ? 'var(--brand-danger)' : slotPercent >= 60 ? 'var(--brand-warning)' : 'var(--brand-success)';
+  const slotColor = slotsLeft === 0 ? '#ef4444' : slotsLeft <= 2 ? '#f59e0b' : '#10b981';
 
   const Sidebar = () => (
     <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-      <div style={{ padding: '8px 16px 4px' }}>
-        <p style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>{tenantName}</p>
-        <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)', paddingBottom: '16px' }}>Workspace</p>
+      <div style={{ marginBottom: '2rem' }}>
+        <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>{tenantName}</h2>
+        <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Workspace</p>
       </div>
-      <nav style={{ flex: 1 }}>
-        <Link onClick={closeSidebar} to="/dashboard" className="sidebar-nav-item">📊 Dashboard</Link>
-        <Link onClick={closeSidebar} to="/billing" className="sidebar-nav-item">💳 Billing</Link>
-        <Link onClick={closeSidebar} to="/documents" className="sidebar-nav-item">📄 Documents</Link>
-        <Link onClick={closeSidebar} to="/editor/0" className="sidebar-nav-item">✏️ Collab Editor</Link>
-        <button onClick={closeSidebar} className="sidebar-nav-item active">👥 Team</button>
-        <Link onClick={closeSidebar} to="/settings" className="sidebar-nav-item">⚙️ Settings</Link>
+      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
+        <Link onClick={closeSidebar} to="/billing"   className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
+        <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
+        <Link onClick={closeSidebar} to="/editor/0"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
+        <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>👥 Team</button>
+        <Link onClick={closeSidebar} to="/settings"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>⚙️ Settings</Link>
       </nav>
-      <div style={{ marginTop: 'auto', borderTop: '1px solid var(--sidebar-border)', padding: '12px 16px' }}>
-        <div style={{ marginBottom: '8px' }}>
-          <p style={{ margin: 0, fontWeight: 500, fontSize: '13px', color: 'var(--text-primary)' }}>{user?.username}</p>
-          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>{user?.role}</p>
+      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
+        <div style={{ marginBottom: '1rem' }}>
+          <p style={{ margin: 0, fontWeight: 500, color: 'var(--text-primary)' }}>{user?.username}</p>
+          <p style={{ margin: 0, fontSize: '0.8rem' }}>{user?.role}</p>
         </div>
         <button onClick={() => { logout(); navigate('/login'); }}
-          style={{ width: '100%', padding: '8px', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: 'var(--brand-danger)', background: 'transparent', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s', marginTop: '8px' }}
-          onMouseEnter={e => e.target.style.background='rgba(239,68,68,0.08)'}
-          onMouseLeave={e => e.target.style.background='transparent'}
-        >
+          className="btn btn-secondary btn-block"
+          style={{ borderColor: 'var(--accent-error)', color: 'var(--accent-error)' }}>
           Log Out
         </button>
       </div>

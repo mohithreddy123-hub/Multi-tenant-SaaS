@@ -547,24 +547,23 @@ const Invoices = () => {
             {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
             <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
             <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-                <div style={{ padding: '8px 16px 4px' }}>
-                    <p style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>TenantVault</p>
-                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)', paddingBottom: '16px' }}>Billing & Invoices</p>
+                <div style={{ marginBottom: '2rem' }}>
+                    <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>TenantVault</h2>
+                    <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Billing & Invoices</p>
                 </div>
-                <nav style={{ flex: 1 }}>
-                    <Link onClick={closeSidebar} to="/dashboard" className="sidebar-nav-item">📊 Dashboard</Link>
-                    <button onClick={closeSidebar} className="sidebar-nav-item active">💳 Billing</button>
-                    <Link onClick={closeSidebar} to="/documents" className="sidebar-nav-item">📄 Documents</Link>
-                    <Link onClick={closeSidebar} to="/editor/0" className="sidebar-nav-item">✏️ Collab Editor</Link>
-                    <Link onClick={closeSidebar} to="/team" className="sidebar-nav-item">👥 Team</Link>
-                    <Link onClick={closeSidebar} to="/settings" className="sidebar-nav-item">⚙️ Settings</Link>
+                <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
+                    <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>💳 Billing</button>
+                    <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
+                    <Link onClick={closeSidebar} to="/editor/0"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
+                    <Link onClick={closeSidebar} to="/settings"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>⚙️ Settings</Link>
                 </nav>
-                <div style={{ marginTop: 'auto', borderTop: '1px solid var(--sidebar-border)', padding: '12px 16px' }}>
+                <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
                     <button onClick={() => { logout(); navigate('/login'); }}
-                        style={{ width: '100%', padding: '8px', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: 'var(--brand-danger)', background: 'transparent', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s', marginTop: '8px' }}
-                        onMouseEnter={e => e.target.style.background='rgba(239,68,68,0.08)'}
-                        onMouseLeave={e => e.target.style.background='transparent'}
-                    >Log Out</button>
+                        className="btn btn-secondary btn-block"
+                        style={{ borderColor: 'var(--accent-error)', color: 'var(--accent-error)' }}>
+                        Log Out
+                    </button>
                 </div>
             </aside>
 
@@ -576,88 +575,59 @@ const Invoices = () => {
                     </div>
                 </header>
 
-                {/* Subscription Summary Card */}
-                <div style={{
-                    background: 'var(--bg-surface)', border: '1px solid var(--bg-border)',
-                    borderLeft: '3px solid var(--brand-primary)',
-                    borderRadius: '16px', padding: '20px 24px', marginBottom: '24px',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px'
-                }}>
-                    <div>
-                        <p style={{ margin: '0 0 4px', fontSize: '13px', color: 'var(--text-muted)' }}>Current Plan</p>
-                        <p style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: 600 }}>Starter Plan</p>
-                        <span style={{ background: invoices.some(i => i.status === 'pending') ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)', color: invoices.some(i => i.status === 'pending') ? 'var(--brand-warning)' : 'var(--brand-success)', border: `1px solid ${invoices.some(i => i.status === 'pending') ? 'rgba(245,158,11,0.3)' : 'rgba(16,185,129,0.3)'}`, padding: '3px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 500 }}>
-                            {invoices.some(i => i.status === 'pending') ? 'Pending Payment' : 'Active'}
-                        </span>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                        <p style={{ margin: '0 0 4px', fontSize: '13px', color: 'var(--text-muted)' }}>Total Invoices</p>
-                        <p style={{ margin: 0, fontSize: '24px', fontWeight: 700, color: 'var(--brand-primary)' }}>{invoices.length}</p>
-                    </div>
-                </div>
-
                 {message && (
-                    <div style={{
-                        padding: '12px 16px', borderRadius: '10px', marginBottom: '16px',
+                    <div className="error-message" style={{
                         background: message.type === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
-                        borderLeft: `3px solid ${message.type === 'success' ? 'var(--brand-success)' : 'var(--brand-danger)'}`,
-                        color: message.type === 'success' ? 'var(--brand-success)' : 'var(--brand-danger)', fontSize: '14px'
+                        borderLeftColor: message.type === 'success' ? 'var(--accent-success)' : 'var(--accent-error)',
+                        color: message.type === 'success' ? 'var(--accent-success)' : 'var(--accent-error)',
                     }}>
                         {message.type === 'success' ? '✅ ' : '❌ '}{message.text}
                     </div>
                 )}
 
-                <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', overflow: 'hidden' }}>
-                    {invoices.length === 0 ? (
-                        <div style={{ padding: '4rem', textAlign: 'center' }}>
-                            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🧾</div>
-                            <p style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 6px' }}>No invoices yet</p>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: 0 }}>Invoices will appear here after your first payment.</p>
-                        </div>
-                    ) : (
+                <div className="glass-panel" style={{ padding: 0 }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                         <thead>
-                            <tr style={{ background: 'var(--bg-elevated)', borderBottom: '1px solid var(--bg-border)' }}>
+                            <tr style={{ borderBottom: '1px solid var(--border-light)' }}>
                                 {['Invoice #', 'Issued Date', 'Amount', 'Status', 'Payment Action'].map(h => (
-                                    <th key={h} style={{ padding: '12px 20px', color: 'var(--text-muted)', fontSize: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
+                                    <th key={h} style={{ padding: '1.25rem 1.5rem', color: 'var(--text-secondary)', fontSize: '0.82rem', fontWeight: 600 }}>{h}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
-                            {invoices.map((inv, idx) => (
-                                <tr key={inv.id} style={{ borderBottom: idx < invoices.length - 1 ? '1px solid var(--bg-border)' : 'none', transition: 'background 0.15s' }}
-                                    onMouseEnter={e => e.currentTarget.style.background='var(--bg-elevated)'}
-                                    onMouseLeave={e => e.currentTarget.style.background='transparent'}
-                                >
-                                    <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '13px', color: 'var(--text-secondary)' }}>#{inv.id}</td>
-                                    <td style={{ padding: '14px 20px', fontSize: '14px' }}>{new Date(inv.issued_at).toLocaleDateString('en-IN')}</td>
-                                    <td style={{ padding: '14px 20px', fontWeight: 700, fontSize: '15px' }}>₹{inv.amount}</td>
-                                    <td style={{ padding: '14px 20px' }}>
+                            {invoices.map(inv => (
+                                <tr key={inv.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                                    <td style={{ padding: '1.25rem 1.5rem', fontFamily: 'monospace', fontSize: '0.9rem' }}>#{inv.id}</td>
+                                    <td style={{ padding: '1.25rem 1.5rem', fontSize: '0.88rem' }}>{new Date(inv.issued_at).toLocaleDateString('en-IN')}</td>
+                                    <td style={{ padding: '1.25rem 1.5rem', fontWeight: 700 }}>₹{inv.amount}</td>
+                                    <td style={{ padding: '1.25rem 1.5rem' }}>
                                         <span style={{
-                                            padding: '3px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 600,
-                                            background: inv.status === 'paid' ? 'rgba(16,185,129,0.1)' : inv.status === 'overdue' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)',
-                                            color: inv.status === 'paid' ? 'var(--brand-success)' : inv.status === 'overdue' ? 'var(--brand-danger)' : 'var(--brand-warning)',
+                                            padding: '0.25rem 0.7rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600,
+                                            background: inv.status === 'paid' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
+                                            color: inv.status === 'paid' ? 'var(--accent-success)' : '#f59e0b',
                                         }}>
                                             {inv.status.toUpperCase()}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '14px 20px' }}>
+                                    <td style={{ padding: '1.25rem 1.5rem' }}>
                                         {inv.status === 'pending' ? (
                                             <button onClick={() => setActiveInvoice(inv)}
-                                                style={{ background: 'var(--brand-primary)', color: 'white', border: 'none', borderRadius: '8px', padding: '7px 16px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', transition: 'background 0.15s' }}
-                                                onMouseEnter={e => e.target.style.background='var(--btn-primary-hover)'}
-                                                onMouseLeave={e => e.target.style.background='var(--brand-primary)'}
-                                            >
+                                                className="btn btn-primary"
+                                                style={{ padding: '0.5rem 1.25rem', fontSize: '0.82rem' }}>
                                                 💳 Pay Now
                                             </button>
                                         ) : (
-                                            <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Paid via {inv.payment_method}</span>
+                                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
+                                                Paid via {inv.payment_method}
+                                            </span>
                                         )}
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+                    {invoices.length === 0 && (
+                        <p style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No invoices found.</p>
                     )}
                 </div>
             </main>

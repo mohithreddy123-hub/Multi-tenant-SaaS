@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
 import { AuthContext } from '../contexts/AuthContext';
+import { useMobileSidebar } from '../hooks/useMobileSidebar';
 
 /* ════════════════════════════════════════════════════
    AMAZON-STYLE PAYMENT GATEWAY
@@ -507,6 +508,7 @@ const Invoices = () => {
     const [activeInvoice, setActiveInvoice] = useState(null);
     const [paidInvoice, setPaidInvoice]   = useState(null); // for receipt
     const [message, setMessage]           = useState(null);
+    const { sidebarOpen, toggleSidebar, closeSidebar } = useMobileSidebar();
 
     useEffect(() => { fetchInvoices(); }, []);
 
@@ -541,18 +543,20 @@ const Invoices = () => {
     if (loading) return <div className="auth-container"><span className="loader" /></div>;
 
     return (
-        <div className="app-container">
-            <aside className="sidebar">
+        <div className="app-layout">
+            {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
+            <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
+            <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div style={{ marginBottom: '2rem' }}>
                     <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>TenantVault</h2>
                     <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Billing & Invoices</p>
                 </div>
                 <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <Link to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
-                    <button className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>💳 Billing</button>
-                    <Link to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
-                    <Link to="/editor/0"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
-                    <Link to="/settings"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>⚙️ Settings</Link>
+                    <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
+                    <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>💳 Billing</button>
+                    <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
+                    <Link onClick={closeSidebar} to="/editor/0"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
+                    <Link onClick={closeSidebar} to="/settings"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>⚙️ Settings</Link>
                 </nav>
                 <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
                     <button onClick={() => { logout(); navigate('/login'); }}

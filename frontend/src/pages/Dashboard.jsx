@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useRef } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
+import { useMobileSidebar } from '../hooks/useMobileSidebar';
 
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
@@ -10,6 +11,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [liveEvent, setLiveEvent] = useState(null);
   const wsRef = useRef(null);
+  const { sidebarOpen, toggleSidebar, closeSidebar } = useMobileSidebar();
 
   const fetchDashboard = async () => {
     try {
@@ -87,30 +89,32 @@ const Dashboard = () => {
   const storageColor = storagePct > 80 ? 'var(--accent-error)' : storagePct > 50 ? '#f59e0b' : 'var(--accent-success)';
 
   return (
-    <div className="app-container">
+    <div className="app-layout">
+      {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
+      <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div style={{ marginBottom: '2rem' }}>
           <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>{data?.tenant?.name}</h2>
           <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Workspace</p>
         </div>
         <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <button className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>
+          <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>
             📊 Dashboard
           </button>
-          <Link to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
+          <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
             💳 Billing
           </Link>
-          <Link to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
+          <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
             📄 Documents
           </Link>
-          <Link to="/editor/0" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
+          <Link onClick={closeSidebar} to="/editor/0" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
             ✏️ Collab Editor
           </Link>
-          <Link to="/team" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
+          <Link onClick={closeSidebar} to="/team" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
             👥 Team
           </Link>
-          <Link to="/settings" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
+          <Link onClick={closeSidebar} to="/settings" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
             ⚙️ Settings
           </Link>
         </nav>

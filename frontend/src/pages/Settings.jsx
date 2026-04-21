@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import api from '../api';
+import { useMobileSidebar } from '../hooks/useMobileSidebar';
 
 /* ─── Reusable Section Card ─────────────────────────── */
 const SettingsSection = ({ icon, title, subtitle, children }) => (
@@ -54,6 +55,7 @@ const planMeta = {
 const Settings = () => {
     const { user, logout, updateUser } = useContext(AuthContext);
     const navigate = useNavigate();
+    const { sidebarOpen, toggleSidebar, closeSidebar } = useMobileSidebar();
 
     // Active section tab
     const [activeTab, setActiveTab] = useState('profile');
@@ -145,20 +147,22 @@ const Settings = () => {
     const currentPlan = planMeta[user?.tenant?.plan] || planMeta.starter;
 
     return (
-        <div className="app-container">
+        <div className="app-layout">
+            {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
+            <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
             {/* ── Sidebar ── */}
-            <aside className="sidebar">
+            <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div style={{ marginBottom: '2rem' }}>
                     <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>TenantVault</h2>
                     <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Account Settings</p>
                 </div>
 
                 <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <Link to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
-                    <Link to="/billing"   className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
-                    <Link to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
-                    <Link to="/editor/0"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
-                    <button className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(99,102,241,0.15)', color: 'var(--brand-primary)' }}>
+                    <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
+                    <Link onClick={closeSidebar} to="/billing"   className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
+                    <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
+                    <Link onClick={closeSidebar} to="/editor/0"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
+                    <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(99,102,241,0.15)', color: 'var(--brand-primary)' }}>
                         ⚙️ Settings
                     </button>
                 </nav>

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../api';
+import { useMobileSidebar } from '../hooks/useMobileSidebar';
 
 const COLORS = [
   '#60a5fa', '#34d399', '#f472b6', '#fbbf24', '#a78bfa',
@@ -20,6 +21,7 @@ const Editor = () => {
   const wsRef = useRef(null);
   const textareaRef = useRef(null);
   const selfUsername = user?.username || 'Anonymous';
+  const { sidebarOpen, toggleSidebar, closeSidebar } = useMobileSidebar();
 
   // ── Assign color per username ──
   const colorMap = useRef({});
@@ -120,19 +122,21 @@ const Editor = () => {
   const charCount = text.length;
 
   return (
-    <div className="app-container">
+    <div className="app-layout">
+      {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
+      <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div style={{ marginBottom: '2rem' }}>
           <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>{user?.tenant?.name || 'Workspace'}</h2>
           <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Editor</p>
         </div>
         <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Link to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
-          <Link to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
-          <Link to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
-          <button className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>✏️ Collab Editor</button>
-          <button className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }} disabled>⚙️ Settings</button>
+          <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
+          <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
+          <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
+          <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>✏️ Collab Editor</button>
+          <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }} disabled>⚙️ Settings</button>
         </nav>
 
         {/* Active collaborators */}

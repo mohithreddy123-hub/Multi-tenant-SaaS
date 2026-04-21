@@ -280,7 +280,29 @@ class DocumentDeleteView(APIView):
         doc_id = doc.id
         doc_title = doc.title
 
-        # Delete the document (Django will handle deleting associated versions and analytics due to CASCADE)
+        # Safely attempt to delete any stored files from Cloudinary/storage.
+        # v0 or failed docs may have no encrypted file — that must not block deletion.
+        try:
+            if doc.encrypted_file:
+                doc.encrypted_file.delete(save=False)
+        except Exception:
+            pass  # File missing on Cloudinary — safe to ignore
+
+        try:
+            if doc.raw_file:
+                doc.raw_file.delete(save=False)
+        except Exception:
+            pass  # Temp raw file may already be cleaned up — safe to ignore
+
+        # Delete all version files individually with the same guard
+        for version in doc.versions.all():
+            try:
+                if version.encrypted_file:
+                    version.encrypted_file.delete(save=False)
+            except Exception:
+                pass
+
+        # Now delete the database record (CASCADE removes versions & analytics rows)
         doc.delete()
 
         # Log deletion

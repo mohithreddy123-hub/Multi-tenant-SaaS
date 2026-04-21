@@ -42,6 +42,7 @@ const Documents = () => {
   const [rollingBack, setRollingBack] = useState(false);
   const [showAttach, setShowAttach] = useState(false);
   const [acceptType, setAcceptType] = useState("*/*");
+  const [openMenuId, setOpenMenuId] = useState(null); // tracks which row's 3-dot menu is open
 
   useEffect(() => { fetchDocuments(); }, []);
 
@@ -269,7 +270,7 @@ const Documents = () => {
             </button>
 
             {showAttach && (
-              <div className="attachment-menu">
+              <div className="attachment-menu" style={{ bottom: 'calc(100% + 10px)', top: 'auto', right: 0, left: 'auto' }}>
                 {/* Row 1 */}
                 <button className="attachment-item" onClick={() => { setAcceptType('image/*'); setShowAttach(false); setTimeout(() => fileInputRef.current.click(), 100); }}>
                   <div className="attachment-icon-circle" style={{ background: 'linear-gradient(135deg, #ec4899, #8b5cf6)' }}>🖼️</div>
@@ -341,45 +342,83 @@ const Documents = () => {
                     <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>{doc.uploaded_by_name || 'System'}</td>
                     <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>{formatBytes(doc.file_size)}</td>
                     <td style={{ padding: '1rem 1.5rem' }}>
-                      <span style={{
-                        background: 'rgba(99,102,241,0.15)', color: '#a5b4fc',
-                        padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 600
-                      }}>
-                        v{doc.versions?.length ?? 1}
-                      </span>
+                      {doc.status === 'failed' ? (
+                        <span
+                          title="Encryption failed. You can delete this file."
+                          style={{
+                            background: 'rgba(239,68,68,0.15)', color: '#ef4444',
+                            padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.8rem',
+                            fontWeight: 600, cursor: 'help'
+                          }}
+                        >
+                          ❌ Failed
+                        </span>
+                      ) : (
+                        <span style={{
+                          background: 'rgba(99,102,241,0.15)', color: '#a5b4fc',
+                          padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 600
+                        }}>
+                          v{doc.versions?.length ?? 1}
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                         {doc.status === 'pending' && (
-                           <span style={{
-                             background: 'rgba(245,158,11,0.15)', color: '#f59e0b',
-                             padding: '0.3rem 0.8rem', borderRadius: '999px',
-                             fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem'
-                           }}>
-                             <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⏳</span> Encrypting...
-                           </span>
-                         )}
-                         {doc.status === 'failed' && (
-                           <span style={{
-                             background: 'rgba(239,68,68,0.15)', color: '#ef4444',
-                             padding: '0.3rem 0.8rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 600
-                           }}>❌ Failed — Re-upload</span>
-                         )}
-                         {doc.status === 'ready' && (<>
-                           <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#c4b5fd', borderColor: 'rgba(196,181,253,0.4)' }}
-                             onClick={() => handlePreview(doc)}>👁 View</button>
-                           <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem' }}
-                             onClick={() => handleDownload(doc)}>⬇️ Download</button>
-                           <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#a5b4fc', borderColor: 'rgba(99,102,241,0.4)' }}
-                             onClick={() => openVersionModal(doc)}>🕒 Versions</button>
-                           <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#34d399', borderColor: 'rgba(52,211,153,0.4)' }}
-                             onClick={() => openAnalyticsModal(doc)}>📈 Analytics</button>
-                           {user?.role === 'admin' && (
-                             <button className="btn btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', color: '#ef4444', borderColor: 'rgba(239,68,68,0.4)' }}
-                               onClick={() => handleDelete(doc)}>🗑️ Delete</button>
-                           )}
-                         </>)}
-                       </div>
+                      {/* 3-dot context menu */}
+                      <div style={{ position: 'relative', display: 'inline-block' }}>
+                        {doc.status === 'pending' ? (
+                          <span style={{
+                            background: 'rgba(245,158,11,0.15)', color: '#f59e0b',
+                            padding: '0.3rem 0.8rem', borderRadius: '999px',
+                            fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.4rem'
+                          }}>
+                            <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⏳</span> Encrypting...
+                          </span>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => setOpenMenuId(openMenuId === doc.id ? null : doc.id)}
+                              style={{
+                                background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-light)',
+                                color: 'var(--text-secondary)', borderRadius: '8px',
+                                width: '34px', height: '34px', cursor: 'pointer', fontSize: '1.1rem',
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+                              }}
+                              title="Actions"
+                            >
+                              ⋮
+                            </button>
+                            {openMenuId === doc.id && (
+                              <div style={{
+                                position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 200,
+                                background: 'var(--bg-card)', border: '1px solid var(--border-light)',
+                                borderRadius: '12px', boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+                                minWidth: '160px', overflow: 'hidden'
+                              }}>
+                                {doc.status === 'ready' && (
+                                  <>
+                                    <button className="doc-menu-item" onClick={() => { handlePreview(doc); setOpenMenuId(null); }}>👁 View</button>
+                                    <button className="doc-menu-item" onClick={() => { handleDownload(doc); setOpenMenuId(null); }}>⬇️ Download</button>
+                                    <button className="doc-menu-item" onClick={() => { openVersionModal(doc); setOpenMenuId(null); }}>🕒 Versions</button>
+                                    <button className="doc-menu-item" onClick={() => { openAnalyticsModal(doc); setOpenMenuId(null); }}>📈 Analytics</button>
+                                  </>
+                                )}
+                                {doc.status === 'failed' && (
+                                  <div style={{ padding: '0.6rem 1rem', fontSize: '0.8rem', color: '#ef4444' }}>❌ Encryption failed</div>
+                                )}
+                                {user?.role === 'admin' && (
+                                  <button
+                                    className="doc-menu-item"
+                                    style={{ color: '#ef4444', borderTop: '1px solid var(--border-light)' }}
+                                    onClick={() => { handleDelete(doc); setOpenMenuId(null); }}
+                                  >
+                                    🗑️ Delete
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

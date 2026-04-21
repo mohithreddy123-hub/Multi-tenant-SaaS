@@ -1002,6 +1002,24 @@ p {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* 3-dot row action dropdown */
+.doc-menu-item {
+  display: block;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.doc-menu-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .attachment-item {
   display: flex;
   flex-direction: column;

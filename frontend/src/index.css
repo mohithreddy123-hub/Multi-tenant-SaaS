@@ -217,6 +217,7 @@ p {
   padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
+  transition: transform 0.3s ease-in-out;
 }
 
 .main-content {
@@ -1092,9 +1093,11 @@ p {
     align-items: center;
     justify-content: center;
   }
-  
+
+  /* Overlay is rendered conditionally in JSX — just ensure it fills screen */
   .sidebar-overlay {
     display: block;
+    animation: fadeIn 0.2s ease;
   }
 
   .sidebar {

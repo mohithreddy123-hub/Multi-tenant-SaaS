@@ -214,23 +214,28 @@ const Documents = () => {
   // Sidebar shared component
   const Sidebar = () => (
     <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-      <div style={{ marginBottom: '2rem' }}>
-        <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>{tenant?.name}</h2>
-        <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Workspace</p>
+      <div style={{ padding: '8px 16px 4px' }}>
+        <p style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>{tenant?.name}</p>
+        <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)', paddingBottom: '16px' }}>Workspace</p>
       </div>
-      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
-        <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
-        <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>📄 Documents</button>
-        <Link onClick={closeSidebar} to="/editor/0" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
-        <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }} disabled>⚙️ Settings</button>
+      <nav style={{ flex: 1 }}>
+        <Link onClick={closeSidebar} to="/dashboard" className="sidebar-nav-item">📊 Dashboard</Link>
+        <Link onClick={closeSidebar} to="/billing" className="sidebar-nav-item">💳 Billing</Link>
+        <button onClick={closeSidebar} className="sidebar-nav-item active">📄 Documents</button>
+        <Link onClick={closeSidebar} to="/editor/0" className="sidebar-nav-item">✏️ Collab Editor</Link>
+        <Link onClick={closeSidebar} to="/team" className="sidebar-nav-item">👥 Team</Link>
+        <Link onClick={closeSidebar} to="/settings" className="sidebar-nav-item">⚙️ Settings</Link>
       </nav>
-      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
-        <div style={{ marginBottom: '1rem' }}>
-          <p style={{ margin: 0, fontWeight: 500, color: 'var(--text-primary)' }}>{user?.username}</p>
-          <p style={{ margin: 0, fontSize: '0.8rem' }}>{user?.role}</p>
+      <div style={{ marginTop: 'auto', borderTop: '1px solid var(--sidebar-border)', padding: '12px 16px' }}>
+        <div style={{ marginBottom: '8px' }}>
+          <p style={{ margin: 0, fontWeight: 500, fontSize: '13px', color: 'var(--text-primary)' }}>{user?.username}</p>
+          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>{user?.role}</p>
         </div>
-        <button onClick={handleLogout} className="btn btn-secondary btn-block" style={{ borderColor: 'var(--accent-error)', color: 'var(--accent-error)' }}>
+        <button onClick={handleLogout}
+          style={{ width: '100%', padding: '8px', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: 'var(--brand-danger)', background: 'transparent', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s', marginTop: '8px' }}
+          onMouseEnter={e => e.target.style.background='rgba(239,68,68,0.08)'}
+          onMouseLeave={e => e.target.style.background='transparent'}
+        >
           Log Out
         </button>
       </div>

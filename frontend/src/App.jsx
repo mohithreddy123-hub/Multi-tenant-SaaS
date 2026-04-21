@@ -5,6 +5,7 @@ import api from './api';
 
 import Signup    from './pages/Signup';
 import Login     from './pages/Login';
+import Landing   from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Invoices  from './pages/Invoices';
 import Documents from './pages/Documents';
@@ -69,7 +70,7 @@ const ProtectedRoute = ({ children }) => {
 
 const AppContent = () => (
   <Routes>
-    <Route path="/"         element={<Login />} />
+    <Route path="/"         element={<Landing />} />
     <Route path="/login"    element={<Login />} />
     <Route path="/register" element={<Signup />} />
 

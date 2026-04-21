@@ -94,36 +94,28 @@ const Dashboard = () => {
       <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>{data?.tenant?.name}</h2>
-          <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Workspace</p>
+        <div style={{ padding: '8px 16px 4px' }}>
+          <p style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>{data?.tenant?.name}</p>
+          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)', paddingBottom: '16px' }}>Workspace</p>
         </div>
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>
-            📊 Dashboard
-          </button>
-          <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            💳 Billing
-          </Link>
-          <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            📄 Documents
-          </Link>
-          <Link onClick={closeSidebar} to="/editor/0" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            ✏️ Collab Editor
-          </Link>
-          <Link onClick={closeSidebar} to="/team" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            👥 Team
-          </Link>
-          <Link onClick={closeSidebar} to="/settings" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            ⚙️ Settings
-          </Link>
+        <nav style={{ flex: 1 }}>
+          <button onClick={closeSidebar} className="sidebar-nav-item active">📊 Dashboard</button>
+          <Link onClick={closeSidebar} to="/billing" className="sidebar-nav-item">💳 Billing</Link>
+          <Link onClick={closeSidebar} to="/documents" className="sidebar-nav-item">📄 Documents</Link>
+          <Link onClick={closeSidebar} to="/editor/0" className="sidebar-nav-item">✏️ Collab Editor</Link>
+          <Link onClick={closeSidebar} to="/team" className="sidebar-nav-item">👥 Team</Link>
+          <Link onClick={closeSidebar} to="/settings" className="sidebar-nav-item">⚙️ Settings</Link>
         </nav>
-        <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <p style={{ margin: 0, fontWeight: 500, color: 'var(--text-primary)' }}>{user?.username}</p>
-            <p style={{ margin: 0, fontSize: '0.8rem' }}>{user?.role}</p>
+        <div style={{ marginTop: 'auto', borderTop: '1px solid var(--sidebar-border)', padding: '12px 16px' }}>
+          <div style={{ marginBottom: '8px' }}>
+            <p style={{ margin: 0, fontWeight: 500, fontSize: '13px', color: 'var(--text-primary)' }}>{user?.username}</p>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>{user?.role}</p>
           </div>
-          <button onClick={handleLogout} className="btn btn-secondary btn-block" style={{ borderColor: 'var(--accent-error)', color: 'var(--accent-error)' }}>
+          <button onClick={handleLogout}
+            style={{ width: '100%', padding: '8px', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: 'var(--brand-danger)', background: 'transparent', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s', marginTop: '8px' }}
+            onMouseEnter={e => e.target.style.background='rgba(239,68,68,0.08)'}
+            onMouseLeave={e => e.target.style.background='transparent'}
+          >
             Log Out
           </button>
         </div>
@@ -151,23 +143,25 @@ const Dashboard = () => {
           </div>
         )}
 
-        <header className="page-header">
+        <header className="page-header page-enter">
           <div>
-            <h1>Overview</h1>
-            <p style={{ margin: 0 }}>Welcome back, {user?.username}. Here's what's happening at {data?.tenant?.name}.</p>
+            <h1 style={{ fontSize: '26px', fontWeight: 600, letterSpacing: '-0.3px' }}>Overview</h1>
+            <p style={{ margin: '4px 0 0', fontSize: '14px', color: 'var(--text-secondary)' }}>Welcome back, {user?.username}. Here’s what’s happening at {data?.tenant?.name}.</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: 'rgba(16,185,129,0.08)', color: 'var(--accent-success)',
-              padding: '0.4rem 0.9rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 500
+              background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)',
+              color: 'var(--brand-success)',
+              padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 500
             }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-success)', display: 'inline-block', animation: 'pulse 2s infinite' }}></span>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--brand-success)', display: 'inline-block', animation: 'pulse 2s infinite' }}></span>
               Live Sync ON
             </div>
             <div style={{
-              background: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent-success)',
-              padding: '0.5rem 1rem', borderRadius: '20px', fontWeight: 500, fontSize: '0.9rem'
+              background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)',
+              color: 'var(--text-accent)',
+              padding: '4px 12px', borderRadius: '20px', fontWeight: 500, fontSize: '12px'
             }}>
               Plan: {data?.tenant?.plan}
             </div>
@@ -175,37 +169,42 @@ const Dashboard = () => {
         </header>
 
         {/* Stats Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
 
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 0 }}>👥 Active Users</h3>
-            <p style={{ fontSize: '2.2rem', color: 'var(--text-primary)', fontWeight: 700, margin: 0 }}>
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', padding: '20px 24px', transition: 'border-color 0.2s', cursor: 'default' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor='rgba(99,102,241,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor='var(--bg-border)'}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px', margin: '0 0 8px' }}>👥 Active Users</p>
+            <p style={{ fontSize: '28px', fontWeight: 600, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.5px' }}>
               {data?.stats?.total_active_users}
-              <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: 400 }}> / {data?.tenant?.user_limit}</span>
+              <span style={{ fontSize: '14px', color: 'var(--text-secondary)', fontWeight: 400 }}> / {data?.tenant?.user_limit}</span>
             </p>
           </div>
 
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 0 }}>📄 Total Documents</h3>
-            <p style={{ fontSize: '2.2rem', color: 'var(--text-primary)', fontWeight: 700, margin: 0 }}>
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', padding: '20px 24px', transition: 'border-color 0.2s', cursor: 'default' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor='rgba(99,102,241,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor='var(--bg-border)'}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: '6px' }}>📄 Total Documents</p>
+            <p style={{ fontSize: '28px', fontWeight: 600, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.5px' }}>
               {data?.stats?.total_documents ?? 0}
             </p>
           </div>
 
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 0 }}>🔒 Privacy Status</h3>
-            <p style={{ fontSize: '1.6rem', color: 'var(--accent-success)', fontWeight: 700, margin: '0 0 0.75rem' }}>
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', padding: '20px 24px', transition: 'border-color 0.2s', cursor: 'default' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor='rgba(99,102,241,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor='var(--bg-border)'}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 8px' }}>🔒 Privacy Status</p>
+            <p style={{ fontSize: '28px', fontWeight: 600, color: 'var(--brand-success)', margin: '0 0 4px', letterSpacing: '-0.5px' }}>
               Protected
-              <span style={{ fontSize: '0.9rem', color: 'var(--accent-success)', fontWeight: 400, marginLeft: '8px' }}>AES-128 ✅</span>
             </p>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-              Zero-knowledge encryption active
-            </div>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0 }}>AES-128 ✓ Zero-knowledge</p>
           </div>
 
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 0 }}>🌐 Workspace Domain</h3>
-            <p style={{ fontSize: '1rem', color: 'var(--brand-primary)', fontWeight: 500, margin: 0, wordBreak: 'break-all' }}>
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)', borderRadius: '16px', padding: '20px 24px', transition: 'border-color 0.2s', cursor: 'default' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor='rgba(99,102,241,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor='var(--bg-border)'}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 8px' }}>🌐 Workspace Domain</p>
+            <p style={{ fontSize: '15px', fontWeight: 500, color: 'var(--brand-secondary)', margin: 0, wordBreak: 'break-all' }}>
               {data?.tenant?.domain}
             </p>
           </div>

@@ -389,7 +389,7 @@ const Documents = () => {
                             </button>
                             {openMenuId === doc.id && (
                               <div style={{
-                                position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 200,
+                                position: 'absolute', right: 0, bottom: 'calc(100% + 6px)', top: 'auto', zIndex: 200,
                                 background: 'var(--bg-card)', border: '1px solid var(--border-light)',
                                 borderRadius: '12px', boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
                                 minWidth: '160px', overflow: 'hidden'

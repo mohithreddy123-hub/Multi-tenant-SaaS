@@ -1088,6 +1088,11 @@ p {
 }
 
 @media (max-width: 768px) {
+  /* Switch from flex to block so fixed sidebar doesn't affect layout */
+  .app-layout {
+    display: block;
+  }
+
   .mobile-menu-btn {
     display: flex;
     align-items: center;
@@ -1116,7 +1121,9 @@ p {
 
   .main-content {
     width: 100%;
-    padding: 5rem 1rem 1rem 1rem; /* Extra top padding for mobile menu btn */
+    min-height: 100vh;
+    padding: 5rem 1rem 1rem 1rem;
+    box-sizing: border-box;
   }
 
   /* Settings Layout */

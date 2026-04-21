@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useRef } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api';
+import { useMobileSidebar } from '../hooks/useMobileSidebar';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
@@ -34,6 +35,7 @@ const Documents = () => {
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
   const wsRef = useRef(null);
+  const { sidebarOpen, toggleSidebar, closeSidebar } = useMobileSidebar();
 
   const [versionModal, setVersionModal] = useState(null);   // { doc }
   const [analyticsModal, setAnalyticsModal] = useState(null); // { doc, data }
@@ -210,17 +212,17 @@ const Documents = () => {
 
   // Sidebar shared component
   const Sidebar = () => (
-    <aside className="sidebar">
+    <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
       <div style={{ marginBottom: '2rem' }}>
         <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>{tenant?.name}</h2>
         <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Workspace</p>
       </div>
       <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <Link to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
-        <Link to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
-        <button className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>📄 Documents</button>
-        <Link to="/editor/0" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
-        <button className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }} disabled>⚙️ Settings</button>
+        <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
+        <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
+        <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>📄 Documents</button>
+        <Link onClick={closeSidebar} to="/editor/0" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
+        <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }} disabled>⚙️ Settings</button>
       </nav>
       <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
         <div style={{ marginBottom: '1rem' }}>
@@ -235,7 +237,9 @@ const Documents = () => {
   );
 
   return (
-    <div className="app-container">
+    <div className="app-layout">
+      {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
+      <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
       <Sidebar />
 
       <main className="main-content">

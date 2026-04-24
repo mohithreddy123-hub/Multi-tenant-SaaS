@@ -223,7 +223,8 @@ const Documents = () => {
         <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
         <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>📄 Documents</button>
         <Link onClick={closeSidebar} to="/editor/0" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
-        <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }} disabled>⚙️ Settings</button>
+        <Link onClick={closeSidebar} to="/team" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>👥 Team</Link>
+        <Link onClick={closeSidebar} to="/settings" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>⚙️ Settings</Link>
       </nav>
       <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
         <div style={{ marginBottom: '1rem' }}>

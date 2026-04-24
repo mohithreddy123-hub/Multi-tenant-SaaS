@@ -162,6 +162,7 @@ const Settings = () => {
                     <Link onClick={closeSidebar} to="/billing"   className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
                     <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
                     <Link onClick={closeSidebar} to="/editor/0"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
+                    <Link onClick={closeSidebar} to="/team"      className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>👥 Team</Link>
                     <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(99,102,241,0.15)', color: 'var(--brand-primary)' }}>
                         ⚙️ Settings
                     </button>

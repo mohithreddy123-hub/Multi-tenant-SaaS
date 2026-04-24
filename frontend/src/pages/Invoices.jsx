@@ -556,6 +556,7 @@ const Invoices = () => {
                     <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>💳 Billing</button>
                     <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
                     <Link onClick={closeSidebar} to="/editor/0"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
+                    <Link onClick={closeSidebar} to="/team"      className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>👥 Team</Link>
                     <Link onClick={closeSidebar} to="/settings"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>⚙️ Settings</Link>
                 </nav>
                 <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>

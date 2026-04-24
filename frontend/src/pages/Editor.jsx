@@ -136,7 +136,8 @@ const Editor = () => {
           <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
           <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
           <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>✏️ Collab Editor</button>
-          <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }} disabled>⚙️ Settings</button>
+          <Link onClick={closeSidebar} to="/team" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>👥 Team</Link>
+          <Link onClick={closeSidebar} to="/settings" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>⚙️ Settings</Link>
         </nav>
 
         {/* Active collaborators */}

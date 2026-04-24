@@ -3,6 +3,7 @@ views.py — Re-export hub.
 All logic lives in domain-specific modules.
 urls.py imports remain unchanged.
 """
+from .views_utils import HealthCheckView                              # noqa: F401
 from .views_auth import TenantRegisterView, LoginView, MeView          # noqa: F401
 from .views_dashboard import DashboardView                              # noqa: F401
 from .views_billing import BillingView, PayInvoiceView                  # noqa: F401

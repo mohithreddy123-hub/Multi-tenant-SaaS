@@ -24,6 +24,7 @@ from .views import (
 
 urlpatterns = [
     # Auth Endpoints
+    path('health/',        HealthCheckView.as_view(),     name='health-check'),
     path('auth/register/', TenantRegisterView.as_view(), name='tenant-register'),
     path('auth/login/',    LoginView.as_view(),           name='login'),
     path('auth/refresh/',  TokenRefreshView.as_view(),    name='token-refresh'),

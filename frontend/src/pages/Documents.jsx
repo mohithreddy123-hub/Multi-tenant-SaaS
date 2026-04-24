@@ -245,9 +245,9 @@ const Documents = () => {
 
       <main className="main-content">
         <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
+          <div style={{ flex: 1 }}>
             <h1>Secure Documents</h1>
-            <p style={{ margin: 0 }}>All files are AES-128 encrypted. Upload, version, and track analytics.</p>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>All files are AES-128 encrypted. Upload, version, and track analytics.</p>
           </div>
           <div className="attachment-menu-container">
             <input 
@@ -270,7 +270,7 @@ const Documents = () => {
             </button>
 
             {showAttach && (
-              <div className="attachment-menu" style={{ bottom: 'calc(100% + 10px)', top: 'auto', right: 0, left: 'auto' }}>
+              <div className="attachment-menu">
                 {/* Row 1 */}
                 <button className="attachment-item" onClick={() => { setAcceptType('image/*'); setShowAttach(false); setTimeout(() => fileInputRef.current.click(), 100); }}>
                   <div className="attachment-icon-circle" style={{ background: 'linear-gradient(135deg, #ec4899, #8b5cf6)' }}>🖼️</div>

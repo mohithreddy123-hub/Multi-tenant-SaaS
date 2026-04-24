@@ -309,7 +309,7 @@ const Documents = () => {
         )}
 
         {/* Document List */}
-        <div className="glass-panel" style={{ padding: '0', overflow: 'hidden' }}>
+        <div className="glass-panel" style={{ padding: '0', overflow: 'visible' }}>
           {documents.length === 0 ? (
             <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
               <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📂</div>
@@ -389,10 +389,10 @@ const Documents = () => {
                             </button>
                             {openMenuId === doc.id && (
                               <div style={{
-                                position: 'absolute', right: 0, bottom: 'calc(100% + 6px)', top: 'auto', zIndex: 200,
+                                position: 'absolute', right: 0, top: 'calc(100% + 6px)', bottom: 'auto', zIndex: 500,
                                 background: 'var(--bg-card)', border: '1px solid var(--border-light)',
                                 borderRadius: '12px', boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
-                                minWidth: '160px', overflow: 'hidden'
+                                minWidth: '160px'
                               }}>
                                 {doc.status === 'ready' && (
                                   <>

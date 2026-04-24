@@ -7,7 +7,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
 
-// ── Inline Modal ──────────────────────────────────────────────────────────────
+// ── Inline Modal ──
 const Modal = ({ title, onClose, children }) => (
   <div style={{
     position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)',

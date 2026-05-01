@@ -106,7 +106,8 @@ Click **☁️ Upload** to reveal a floating glassmorphic attachment menu with 6
 Each option pre-filters the OS file picker to show only the relevant type.
 
 ### 🔐 Zero-Knowledge Document Vault
-- Files are encrypted using **AES-128 (Fernet)** immediately upon upload — before disk storage.
+- Files are asynchronously encrypted using **AES-128 (Fernet)** via **Celery background workers**.
+- Encrypted bytes are securely stored on **Cloudinary**, avoiding ephemeral local disk limitations.
 - Decryption only happens **in-memory** when an authorized user downloads a file.
 - **Version history**: every re-upload creates a `DocumentVersion` snapshot.
 - **Rollback**: replace the current file with any historical version with one click.
@@ -122,6 +123,11 @@ Six tabs: Profile, Security, Workspace, Billing & Plan, Notifications, Danger Zo
 - Update username, email, password (with current password check), company name.
 - View plan features and upgrade options.
 
+### ☁️ Cloud & Production Deployment
+- **Frontend:** Deployed globally on **Vercel's Edge Network** with strict CORS validation.
+- **Backend:** Hosted on **Render** utilizing Daphne ASGI for WebSocket support, plus an automated keep-alive ping to prevent free-tier cold starts.
+- **Database & Cache:** Serverless **Neon PostgreSQL** combined with **Upstash Redis** for Celery workers and WebSocket channel layers.
+
 ---
 
 ## 🛠️ Technology Stack
@@ -130,10 +136,13 @@ Six tabs: Profile, Security, Workspace, Billing & Plan, Notifications, Danger Zo
 |:---|:---|
 | **Backend** | Django 6.0, Django REST Framework |
 | **Real-Time** | Daphne (ASGI), Django Channels, WebSockets |
-| **Database** | PostgreSQL 18.3 |
+| **Database** | PostgreSQL 18.3 (Neon Serverless) |
 | **Frontend** | React 19, Vite, React Router v6, Axios |
 | **Security** | AES-128 (Fernet), JWT (SimpleJWT), CORS |
 | **Styling** | Vanilla CSS — custom dark glassmorphism design system |
+| **Task Queue**| Celery, Redis (Upstash) |
+| **Storage**   | Cloudinary (Secure Cloud Storage) |
+| **Deployment**| Render (Backend), Vercel (Frontend) |
 
 ---
 
@@ -177,6 +186,9 @@ TenantVault/
 │
 ├── credentials.txt           # Test account logins
 ├── PROJECT_STATUS_AND_PROCESS.txt  # Complete project documentation
+├── TENANTVAULT_DOCUMENTATION.md    # Architecture & Tech Specs
+├── render.yaml               # Render IaC configuration
+├── vercel.json               # Vercel deployment config
 ├── requirements.txt          # Python dependencies
 └── manage.py
 ```
@@ -277,13 +289,12 @@ Visit **http://localhost:5173**
 
 | # | Feature | Description |
 |:---|:---|:---|
-| 1 | **Celery + Redis** | Background encryption workers. No server freeze on large uploads. |
-| 2 | **Redis Channel Layer** | WebSocket scaling across multiple backend servers. |
+| 1 | **PDF Receipt Generation** | Upgrading visual transaction receipts into downloadable PDF files. |
+| 2 | **Backend Notification Workers** | Tying UI Email Notification toggles to actual backend SMTP dispatchers. |
 | 3 | **Real Payment Gateway** | Razorpay/Stripe SDK with webhook auto-confirmation. |
-| 4 | **Cloud Storage (AWS S3)** | Stream encrypted files to S3 instead of local disk. |
-| 5 | **Email Invitations** | Send invite links so employees set their own passwords. |
-| 6 | **RBAC Enforcement** | Members: view/upload only. Admins: full control. |
-| 7 | **Docker Deployment** | Containerized production setup with Nginx + Gunicorn. |
+| 4 | **Email Invitations** | Send invite links so employees set their own passwords. |
+| 5 | **RBAC Enforcement** | Members: view/upload only. Admins: full control. |
+| 6 | **Docker Deployment** | Containerized production setup with Nginx + Gunicorn for self-hosting. |
 
 ---
 

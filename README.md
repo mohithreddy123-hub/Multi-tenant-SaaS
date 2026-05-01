@@ -264,7 +264,7 @@ npm install
 npm run dev
 ```
 
-Visit **http://localhost:5173**
+
 
 ### 5. Create Your First Company
 1. Click **"Get Started"** → Fill in the 3-step signup wizard.

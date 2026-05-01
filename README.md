@@ -1,5 +1,6 @@
 <div align="center">
   <h1>🏢 TenantVault</h1>
+  <p><b>🌍 Live Demo: <a href="https://multi-tenant-saa-s-nine.vercel.app">https://multi-tenant-saa-s-nine.vercel.app</a></b></p>
   <p>An enterprise-grade, multi-tenant SaaS platform — a Secure Private Workspace for startups and businesses. Built with Zero-Knowledge Privacy, Pay-to-Activate billing, Real-Time WebSockets, Collaborative Editing, and a full Team Management system.</p>
 
   [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
@@ -248,19 +249,7 @@ pip install psycopg2-binary     # PostgreSQL driver
 ```
 
 ### 2. Configure Database
-Create a PostgreSQL database named `multi_tenant_db`, then verify `backend/settings.py`:
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'multi_tenant_db',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
+Create a PostgreSQL database named `multi_tenant_db` and configure your `DATABASE_URL` connection string in the backend `.env` file.
 
 ### 3. Run Backend
 ```bash

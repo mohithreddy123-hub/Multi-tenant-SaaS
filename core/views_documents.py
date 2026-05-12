@@ -10,6 +10,7 @@ from django.core.files.base import ContentFile
 from django.http import HttpResponse
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+import requests as http_requests
 
 from .models import Document, DocumentVersion, AuditLog, FileAnalytics
 from .serializers import DocumentSerializer, DocumentVersionSerializer
@@ -113,6 +114,17 @@ class DocumentUploadView(APIView):
 class DocumentDownloadView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def _read_encrypted_bytes(self, doc):
+        """Read encrypted bytes — tries direct open(), falls back to HTTP fetch for Cloudinary."""
+        try:
+            with doc.encrypted_file.open('rb') as f:
+                return f.read()
+        except Exception:
+            file_url = doc.encrypted_file.url
+            resp = http_requests.get(file_url, timeout=30)
+            resp.raise_for_status()
+            return resp.content
+
     def get(self, request, pk):
         if not request.user.tenant:
             return Response({'detail': 'No tenant associated.'}, status=400)
@@ -127,8 +139,7 @@ class DocumentDownloadView(APIView):
             return Response({'detail': 'Encryption failed for this file. Please re-upload.'}, status=500)
 
         try:
-            with doc.encrypted_file.open('rb') as f:
-                encrypted_bytes = f.read()
+            encrypted_bytes = self._read_encrypted_bytes(doc)
             decrypted_bytes = decrypt_bytes(encrypted_bytes)
 
             response = HttpResponse(decrypted_bytes, content_type=doc.file_type)
@@ -150,6 +161,22 @@ class DocumentDownloadView(APIView):
 class DocumentPreviewView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def _read_encrypted_bytes(self, doc):
+        """
+        Read encrypted bytes from storage.
+        Tries direct open() first; falls back to HTTP fetch for cloud storage
+        (e.g. Cloudinary) where the context manager may not stream correctly.
+        """
+        try:
+            with doc.encrypted_file.open('rb') as f:
+                return f.read()
+        except Exception:
+            # Cloud storage fallback — fetch via public URL
+            file_url = doc.encrypted_file.url
+            resp = http_requests.get(file_url, timeout=30)
+            resp.raise_for_status()
+            return resp.content
+
     def get(self, request, pk):
         if not request.user.tenant:
             return Response({'detail': 'No tenant associated.'}, status=400)
@@ -164,13 +191,15 @@ class DocumentPreviewView(APIView):
             return Response({'detail': 'Encryption failed for this file. Please re-upload.'}, status=500)
 
         try:
-            with doc.encrypted_file.open('rb') as f:
-                encrypted_bytes = f.read()
+            encrypted_bytes = self._read_encrypted_bytes(doc)
             decrypted_bytes = decrypt_bytes(encrypted_bytes)
 
             response = HttpResponse(decrypted_bytes, content_type=doc.file_type)
             response['Content-Disposition'] = f'inline; filename="{doc.original_filename}"'
+            # Allow embedding in same-origin iframes (for PDF preview)
             response['X-Frame-Options'] = 'SAMEORIGIN'
+            # Allow cross-origin blob URL access
+            response['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
 
             AuditLog.objects.create(
                 tenant=request.user.tenant, user=request.user,

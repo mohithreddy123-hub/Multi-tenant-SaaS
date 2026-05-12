@@ -23,9 +23,34 @@
   --transition: 200ms cubic-bezier(0.4,0,0.2,1);
   --radius: 12px;
   --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --glass: blur(12px) saturate(180%);
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+/* ═══ SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { 
+  background: var(--border); 
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+/* ═══ BASE ═══ */
+*, *::before, *::after { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0;
+  outline-color: var(--accent);
+}
 
 body {
   font-family: 'Inter', -apple-system, sans-serif;
@@ -236,3 +261,23 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .animate-in { animation: slideUp 0.3s ease; }
+
+/* ═══ UTILITIES ═══ */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+  border: 1px solid var(--border);
+}
+
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+

@@ -152,7 +152,17 @@ const Documents = () => {
       setPreviewModal({ doc, url, type: doc.file_type });
       fetchDocuments(); // refresh view count
     } catch (err) {
-      const msg = err.response?.data?.detail || err.message || 'Could not preview this file.';
+      let msg = err.message || 'Could not preview this file.';
+      // Axios returns error response data as a Blob when responseType is 'blob'
+      if (err.response?.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text();
+          const json = JSON.parse(text);
+          msg = json.detail || msg;
+        } catch (_) {}
+      } else if (err.response?.data?.detail) {
+        msg = err.response.data.detail;
+      }
       alert(`Preview error: ${msg}`);
     }
   };

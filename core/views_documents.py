@@ -19,6 +19,32 @@ from .utils.encryption import decrypt_bytes
 # ── Per-file upload cap (Issue 2 + 4: memory bound) ──
 MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024  # 100 MB
 
+
+def _read_encrypted_bytes(doc):
+    """
+    Read encrypted bytes from storage (local or Cloudinary).
+    1. Try direct open() — works for both local files and Cloudinary.
+    2. If open() fails AND the URL is a full Cloudinary URL (https://...),
+       fall back to HTTP fetch.
+    3. If the URL is relative (/media/...), the file is on local disk and
+       genuinely missing — raise a clear error.
+    """
+    try:
+        with doc.encrypted_file.open('rb') as f:
+            return f.read()
+    except Exception as open_err:
+        file_url = doc.encrypted_file.url
+        if file_url.startswith('http'):
+            # Cloudinary fallback — fetch via public URL
+            resp = http_requests.get(file_url, timeout=30)
+            resp.raise_for_status()
+            return resp.content
+        # Local storage — file is genuinely missing (e.g. wiped by Render redeploy)
+        raise FileNotFoundError(
+            f'File "{doc.original_filename}" is no longer available on the server. '
+            f'Please re-upload the document.'
+        ) from open_err
+
 # ── Permitted MIME types (Issue 3: backend whitelist) ──
 ALLOWED_MIME_TYPES = {
     'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
@@ -114,17 +140,6 @@ class DocumentUploadView(APIView):
 class DocumentDownloadView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def _read_encrypted_bytes(self, doc):
-        """Read encrypted bytes — tries direct open(), falls back to HTTP fetch for Cloudinary."""
-        try:
-            with doc.encrypted_file.open('rb') as f:
-                return f.read()
-        except Exception:
-            file_url = doc.encrypted_file.url
-            resp = http_requests.get(file_url, timeout=30)
-            resp.raise_for_status()
-            return resp.content
-
     def get(self, request, pk):
         if not request.user.tenant:
             return Response({'detail': 'No tenant associated.'}, status=400)
@@ -139,7 +154,7 @@ class DocumentDownloadView(APIView):
             return Response({'detail': 'Encryption failed for this file. Please re-upload.'}, status=500)
 
         try:
-            encrypted_bytes = self._read_encrypted_bytes(doc)
+            encrypted_bytes = _read_encrypted_bytes(doc)
             decrypted_bytes = decrypt_bytes(encrypted_bytes)
 
             response = HttpResponse(decrypted_bytes, content_type=doc.file_type)
@@ -161,22 +176,6 @@ class DocumentDownloadView(APIView):
 class DocumentPreviewView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def _read_encrypted_bytes(self, doc):
-        """
-        Read encrypted bytes from storage.
-        Tries direct open() first; falls back to HTTP fetch for cloud storage
-        (e.g. Cloudinary) where the context manager may not stream correctly.
-        """
-        try:
-            with doc.encrypted_file.open('rb') as f:
-                return f.read()
-        except Exception:
-            # Cloud storage fallback — fetch via public URL
-            file_url = doc.encrypted_file.url
-            resp = http_requests.get(file_url, timeout=30)
-            resp.raise_for_status()
-            return resp.content
-
     def get(self, request, pk):
         if not request.user.tenant:
             return Response({'detail': 'No tenant associated.'}, status=400)
@@ -191,7 +190,7 @@ class DocumentPreviewView(APIView):
             return Response({'detail': 'Encryption failed for this file. Please re-upload.'}, status=500)
 
         try:
-            encrypted_bytes = self._read_encrypted_bytes(doc)
+            encrypted_bytes = _read_encrypted_bytes(doc)
             decrypted_bytes = decrypt_bytes(encrypted_bytes)
 
             response = HttpResponse(decrypted_bytes, content_type=doc.file_type)

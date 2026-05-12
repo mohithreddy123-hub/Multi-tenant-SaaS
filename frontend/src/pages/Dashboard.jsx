@@ -1,17 +1,19 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
-import { useMobileSidebar } from '../hooks/useMobileSidebar';
+import {
+  Users, FileText, Shield, Globe, Zap,
+  Upload, UserPlus, PenTool, ArrowUpRight
+} from 'lucide-react';
 
 const Dashboard = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [liveEvent, setLiveEvent] = useState(null);
   const wsRef = useRef(null);
-  const { sidebarOpen, toggleSidebar, closeSidebar } = useMobileSidebar();
 
   const fetchDashboard = async () => {
     try {
@@ -24,12 +26,9 @@ const Dashboard = () => {
     }
   };
 
-  useEffect(() => {
-    fetchDashboard();
-  }, []);
+  useEffect(() => { fetchDashboard(); }, []);
 
-  // ── Real-time WebSocket connection ──
-  // Real-time WebSocket — with auto-reconnect (Fix 3)
+  // Real-time WebSocket — with auto-reconnect
   useEffect(() => {
     if (!user?.tenant?.id) return;
     let retryCount = 0;
@@ -74,145 +73,117 @@ const Dashboard = () => {
     };
   }, [user]);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   if (loading) return (
-    <div className="auth-container">
-      <span className="loader" style={{ width: '40px', height: '40px', borderWidth: '4px' }}></span>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+      <div className="tv-loader" style={{ width: 36, height: 36, borderWidth: 3 }} />
     </div>
   );
 
   const storagePct = data?.stats?.storage_percent ?? 0;
-  const storageColor = storagePct > 80 ? 'var(--accent-error)' : storagePct > 50 ? '#f59e0b' : 'var(--accent-success)';
+  const storageColor = storagePct > 80 ? 'var(--error)' : storagePct > 50 ? 'var(--warning)' : 'var(--success)';
+
+  const stats = [
+    { label: 'Active Users', value: data?.stats?.total_active_users, sub: `/ ${data?.tenant?.user_limit} seats`, icon: Users, color: 'var(--accent)' },
+    { label: 'Total Documents', value: data?.stats?.total_documents ?? 0, sub: 'encrypted files', icon: FileText, color: 'var(--accent-cyan)' },
+    { label: 'Privacy Status', value: 'Protected', sub: 'AES-128 · Zero-knowledge', icon: Shield, color: 'var(--success)' },
+    { label: 'Workspace', value: data?.tenant?.domain, sub: data?.tenant?.plan + ' plan', icon: Globe, color: 'var(--accent-secondary)' },
+  ];
+
+  const quickActions = [
+    { label: 'Upload File', icon: Upload, onClick: () => navigate('/documents'), color: 'var(--accent)' },
+    { label: 'Invite Member', icon: UserPlus, onClick: () => navigate('/team'), color: 'var(--success)' },
+    { label: 'Open Editor', icon: PenTool, onClick: () => navigate('/editor/0'), color: 'var(--accent-secondary)' },
+    { label: 'Upgrade Plan', icon: ArrowUpRight, onClick: () => navigate('/billing'), color: 'var(--warning)' },
+  ];
 
   return (
-    <div className="app-layout">
-      {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
-      <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
-      {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>{data?.tenant?.name}</h2>
-          <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Workspace</p>
+    <div className="animate-in">
+      {/* Live event banner */}
+      {liveEvent && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(99,102,241,0.1))',
+          border: '1px solid rgba(16,185,129,0.25)',
+          borderRadius: 'var(--radius)',
+          padding: '0.75rem 1.25rem',
+          marginBottom: '1.5rem',
+          display: 'flex', alignItems: 'center', gap: '0.75rem',
+          animation: 'slideUp 0.3s ease',
+        }}>
+          <Zap size={16} style={{ color: 'var(--success)' }} />
+          <span style={{ color: 'var(--success)', fontWeight: 500, fontSize: '0.85rem' }}>
+            Live: {liveEvent.uploader} uploaded "{liveEvent.doc_title}"
+          </span>
         </div>
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>
-            📊 Dashboard
-          </button>
-          <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            💳 Billing
-          </Link>
-          <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            📄 Documents
-          </Link>
-          <Link onClick={closeSidebar} to="/editor/0" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            ✏️ Collab Editor
-          </Link>
-          <Link onClick={closeSidebar} to="/team" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            👥 Team
-          </Link>
-          <Link onClick={closeSidebar} to="/settings" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>
-            ⚙️ Settings
-          </Link>
-        </nav>
-        <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <p style={{ margin: 0, fontWeight: 500, color: 'var(--text-primary)' }}>{user?.username}</p>
-            <p style={{ margin: 0, fontSize: '0.8rem' }}>{user?.role}</p>
-          </div>
-          <button onClick={handleLogout} className="btn btn-secondary btn-block" style={{ borderColor: 'var(--accent-error)', color: 'var(--accent-error)' }}>
-            Log Out
-          </button>
+      )}
+
+      {/* Header */}
+      <div className="tv-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h1 className="tv-page-title">Overview</h1>
+          <p className="tv-page-desc">Welcome back, {user?.username}. Here's what's happening at {data?.tenant?.name}.</p>
         </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="main-content">
-        {/* Live event banner */}
-        {liveEvent && (
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(99,102,241,0.15))',
-            border: '1px solid rgba(16,185,129,0.4)',
-            borderRadius: '12px',
-            padding: '0.85rem 1.5rem',
-            marginBottom: '1.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            animation: 'fadeIn 0.3s ease',
-          }}>
-            <span style={{ fontSize: '1.2rem' }}>🔴</span>
-            <span style={{ color: 'var(--accent-success)', fontWeight: 500 }}>
-              Live: {liveEvent.uploader} just uploaded "{liveEvent.doc_title}" — dashboard refreshed automatically.
-            </span>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <div className="tv-badge tv-badge-success" style={{ padding: '0.35rem 0.8rem', fontSize: '0.78rem' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+            Live Sync
           </div>
-        )}
-
-        <header className="page-header">
-          <div>
-            <h1>Overview</h1>
-            <p style={{ margin: 0 }}>Welcome back, {user?.username}. Here's what's happening at {data?.tenant?.name}.</p>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: 'rgba(16,185,129,0.08)', color: 'var(--accent-success)',
-              padding: '0.4rem 0.9rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 500
-            }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-success)', display: 'inline-block', animation: 'pulse 2s infinite' }}></span>
-              Live Sync ON
-            </div>
-            <div style={{
-              background: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent-success)',
-              padding: '0.5rem 1rem', borderRadius: '20px', fontWeight: 500, fontSize: '0.9rem'
-            }}>
-              Plan: {data?.tenant?.plan}
-            </div>
-          </div>
-        </header>
-
-        {/* Stats Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 0 }}>👥 Active Users</h3>
-            <p style={{ fontSize: '2.2rem', color: 'var(--text-primary)', fontWeight: 700, margin: 0 }}>
-              {data?.stats?.total_active_users}
-              <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: 400 }}> / {data?.tenant?.user_limit}</span>
-            </p>
-          </div>
-
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 0 }}>📄 Total Documents</h3>
-            <p style={{ fontSize: '2.2rem', color: 'var(--text-primary)', fontWeight: 700, margin: 0 }}>
-              {data?.stats?.total_documents ?? 0}
-            </p>
-          </div>
-
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 0 }}>🔒 Privacy Status</h3>
-            <p style={{ fontSize: '1.6rem', color: 'var(--accent-success)', fontWeight: 700, margin: '0 0 0.75rem' }}>
-              Protected
-              <span style={{ fontSize: '0.9rem', color: 'var(--accent-success)', fontWeight: 400, marginLeft: '8px' }}>AES-128 ✅</span>
-            </p>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-              Zero-knowledge encryption active
-            </div>
-          </div>
-
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 0 }}>🌐 Workspace Domain</h3>
-            <p style={{ fontSize: '1rem', color: 'var(--brand-primary)', fontWeight: 500, margin: 0, wordBreak: 'break-all' }}>
-              {data?.tenant?.domain}
-            </p>
+          <div className="tv-badge tv-badge-info" style={{ padding: '0.35rem 0.8rem', fontSize: '0.78rem' }}>
+            {data?.tenant?.plan}
           </div>
         </div>
+      </div>
 
+      {/* Stats Grid */}
+      <div className="tv-grid tv-grid-4" style={{ marginBottom: '2rem' }}>
+        {stats.map((s, i) => {
+          const Icon = s.icon;
+          return (
+            <div key={i} className="tv-card tv-card-glow tv-stat">
+              <div className="tv-stat-label">
+                <Icon size={15} style={{ color: s.color }} />
+                {s.label}
+              </div>
+              <div className="tv-stat-value" style={{ color: s.label === 'Privacy Status' ? 'var(--success)' : 'var(--text-primary)', fontSize: s.label === 'Workspace' ? '0.95rem' : undefined }}>
+                {s.value}
+                {s.label === 'Active Users' && <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 400, marginLeft: 6 }}>{s.sub}</span>}
+              </div>
+              {s.label !== 'Active Users' && <div className="tv-stat-sub">{s.sub}</div>}
+            </div>
+          );
+        })}
+      </div>
 
-      </main>
+      {/* Storage Usage */}
+      <div className="tv-card" style={{ marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: 500 }}>Storage Usage</span>
+          <span style={{ fontSize: '0.8rem', color: storageColor, fontWeight: 600 }}>{storagePct}%</span>
+        </div>
+        <div className="tv-progress">
+          <div className="tv-progress-fill" style={{ width: `${storagePct}%`, background: storageColor }} />
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--text-secondary)' }}>Quick Actions</h3>
+      <div className="tv-grid tv-grid-4" style={{ marginBottom: '2rem' }}>
+        {quickActions.map((a, i) => {
+          const Icon = a.icon;
+          return (
+            <button key={i} className="tv-card tv-card-glow" onClick={a.onClick}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid var(--border)' }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10,
+                background: `color-mix(in srgb, ${a.color} 12%, transparent)`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Icon size={18} style={{ color: a.color }} />
+              </div>
+              <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{a.label}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };

@@ -16,3 +16,4 @@ whitenoise
 cloudinary
 django-cloudinary-storage
 channels-redis
+requests

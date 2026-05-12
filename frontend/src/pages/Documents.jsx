@@ -2,23 +2,16 @@ import React, { useContext, useEffect, useState, useRef } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api';
-import { useMobileSidebar } from '../hooks/useMobileSidebar';
+import { Upload, X, MoreVertical, Eye, Download, Clock, BarChart3, Trash2, FileText, Loader } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
 
 // ── Inline Modal ──
 const Modal = ({ title, onClose, children }) => (
-  <div style={{
-    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)',
-    backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center',
-    justifyContent: 'center', zIndex: 1000, padding: '1rem'
-  }}>
-    <div className="glass-panel" style={{ width: '100%', maxWidth: '560px', padding: '2rem', position: 'relative', maxHeight: '80vh', overflowY: 'auto' }}>
-      <button onClick={onClose} style={{
-        position: 'absolute', top: '1rem', right: '1rem', background: 'none',
-        border: 'none', color: 'var(--text-secondary)', fontSize: '1.4rem', cursor: 'pointer'
-      }}>×</button>
+  <div className="tv-modal-overlay" onClick={onClose}>
+    <div className="tv-modal" style={{ maxWidth: '560px' }} onClick={e => e.stopPropagation()}>
+      <button className="tv-modal-close" onClick={onClose}><X size={18} /></button>
       <h2 style={{ marginTop: 0, marginBottom: '1.5rem', fontSize: '1.1rem' }}>{title}</h2>
       {children}
     </div>
@@ -35,7 +28,7 @@ const Documents = () => {
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
   const wsRef = useRef(null);
-  const { sidebarOpen, toggleSidebar, closeSidebar } = useMobileSidebar();
+
 
   const [versionModal, setVersionModal] = useState(null);   // { doc }
   const [analyticsModal, setAnalyticsModal] = useState(null); // { doc, data }
@@ -106,7 +99,7 @@ const Documents = () => {
     }
   };
 
-  const handleLogout = () => { logout(); navigate('/login'); };
+
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -228,49 +221,18 @@ const Documents = () => {
   };
 
   if (loading) return (
-    <div className="auth-container">
-      <span className="loader" style={{ width: '40px', height: '40px', borderWidth: '4px' }}></span>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+      <div className="tv-loader" style={{ width: 36, height: 36, borderWidth: 3 }} />
     </div>
   );
 
-  // Sidebar shared component
-  const Sidebar = () => (
-    <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-      <div style={{ marginBottom: '2rem' }}>
-        <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>{tenant?.name}</h2>
-        <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Workspace</p>
-      </div>
-      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
-        <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
-        <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>📄 Documents</button>
-        <Link onClick={closeSidebar} to="/editor/0" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
-        <Link onClick={closeSidebar} to="/team" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>👥 Team</Link>
-        <Link onClick={closeSidebar} to="/settings" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>⚙️ Settings</Link>
-      </nav>
-      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
-        <div style={{ marginBottom: '1rem' }}>
-          <p style={{ margin: 0, fontWeight: 500, color: 'var(--text-primary)' }}>{user?.username}</p>
-          <p style={{ margin: 0, fontSize: '0.8rem' }}>{user?.role}</p>
-        </div>
-        <button onClick={handleLogout} className="btn btn-secondary btn-block" style={{ borderColor: 'var(--accent-error)', color: 'var(--accent-error)' }}>
-          Log Out
-        </button>
-      </div>
-    </aside>
-  );
-
   return (
-    <div className="app-layout">
-      {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
-      <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
-      <Sidebar />
+    <div className="animate-in">
 
-      <main className="main-content">
-        <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ flex: 1 }}>
-            <h1>Secure Documents</h1>
-            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>All files are AES-128 encrypted. Upload, version, and track analytics.</p>
+        <div className="tv-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h1 className="tv-page-title">Secure Documents</h1>
+            <p className="tv-page-desc">All files are AES-128 encrypted. Upload, version, and track analytics.</p>
           </div>
           <div className="attachment-menu-container">
             <input 
@@ -282,14 +244,13 @@ const Documents = () => {
             />
             
             <button 
-              className="btn btn-primary" 
+              className="tv-btn tv-btn-primary" 
               onClick={() => setShowAttach(!showAttach)} 
               disabled={uploading}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
               {uploading 
-                ? <><span className="loader" style={{ width: 16, height: 16, borderWidth: 2 }}></span> Uploading...</> 
-                : (showAttach ? '✕ Cancel' : '☁️ Upload')}
+                ? <><div className="tv-loader" style={{ width: 14, height: 14, borderWidth: 2 }} /> Uploading...</> 
+                : (showAttach ? <><X size={14} /> Cancel</> : <><Upload size={14} /> Upload</>)}
             </button>
 
             {showAttach && (
@@ -323,118 +284,86 @@ const Documents = () => {
               </div>
             )}
           </div>
-        </header>
+        </div>
 
-        {error && (
-          <div style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--accent-error)', padding: '1rem', borderRadius: '12px', marginBottom: '2rem' }}>
-            {error}
-          </div>
-        )}
+        {error && <div className="tv-error">{error}</div>}
 
         {/* Document List */}
-        <div className="glass-panel" style={{ padding: '0', overflow: 'visible' }}>
+        <div className="tv-card" style={{ padding: 0, overflow: 'visible' }}>
           {documents.length === 0 ? (
-            <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📂</div>
+            <div className="tv-empty">
+              <div className="tv-empty-icon"><FileText size={48} /></div>
               <h3>No documents yet</h3>
               <p>Upload a file to get started. It will be securely encrypted.</p>
             </div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <div style={{ overflowX: 'auto' }}>
+            <table className="tv-table">
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-light)', background: 'rgba(255,255,255,0.02)' }}>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Name</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Uploader</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Size</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Versions</th>
-                  <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)', textAlign: 'right' }}>Actions</th>
+                <tr>
+                  <th>Name</th>
+                  <th>Uploader</th>
+                  <th>Size</th>
+                  <th>Versions</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {documents.map((doc) => (
-                  <tr key={doc.id} style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s' }} className="table-row-hover">
-                    <td style={{ padding: '1rem 1.5rem', fontWeight: 500 }}>
+                  <tr key={doc.id}>
+                    <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <span style={{ fontSize: '1.2rem' }}>{getFileIcon(doc.file_type)}</span>
                         <div>
-                          <div>{doc.title}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{formatBytes(doc.file_size)}</div>
+                          <div style={{ fontWeight: 500 }}>{doc.title}</div>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>{formatBytes(doc.file_size)}</div>
                         </div>
                       </div>
                     </td>
-                    <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>{doc.uploaded_by_name || 'System'}</td>
-                    <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>{formatBytes(doc.file_size)}</td>
-                    <td style={{ padding: '1rem 1.5rem' }}>
+                    <td style={{ color: 'var(--text-secondary)' }}>{doc.uploaded_by_name || 'System'}</td>
+                    <td style={{ color: 'var(--text-secondary)' }}>{formatBytes(doc.file_size)}</td>
+                    <td>
                       {doc.status === 'failed' ? (
-                        <span
-                          title="Encryption failed. You can delete this file."
-                          style={{
-                            background: 'rgba(239,68,68,0.15)', color: '#ef4444',
-                            padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.8rem',
-                            fontWeight: 600, cursor: 'help'
-                          }}
-                        >
-                          ❌ Failed
-                        </span>
+                        <span className="tv-badge tv-badge-error" title="Encryption failed">Failed</span>
                       ) : (
-                        <span style={{
-                          background: 'rgba(99,102,241,0.15)', color: '#a5b4fc',
-                          padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 600
-                        }}>
-                          v{doc.versions?.length ?? 1}
-                        </span>
+                        <span className="tv-badge tv-badge-info">v{doc.versions?.length ?? 1}</span>
                       )}
                     </td>
-                    <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                      {/* 3-dot context menu */}
+                    <td style={{ textAlign: 'right' }}>
                       <div style={{ position: 'relative', display: 'inline-block' }}>
                         {doc.status === 'pending' ? (
-                          <span style={{
-                            background: 'rgba(245,158,11,0.15)', color: '#f59e0b',
-                            padding: '0.3rem 0.8rem', borderRadius: '999px',
-                            fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.4rem'
-                          }}>
-                            <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⏳</span> Encrypting...
+                          <span className="tv-badge tv-badge-warning" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                            <Loader size={12} style={{ animation: 'spin 1s linear infinite' }} /> Encrypting...
                           </span>
                         ) : (
                           <>
-                            <button
+                            <button className="tv-btn tv-btn-ghost"
                               onClick={() => setOpenMenuId(openMenuId === doc.id ? null : doc.id)}
-                              style={{
-                                background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-light)',
-                                color: 'var(--text-secondary)', borderRadius: '8px',
-                                width: '34px', height: '34px', cursor: 'pointer', fontSize: '1.1rem',
-                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
-                              }}
-                              title="Actions"
-                            >
-                              ⋮
+                              style={{ padding: '0.3rem' }}>
+                              <MoreVertical size={16} />
                             </button>
                             {openMenuId === doc.id && (
                               <div style={{
-                                position: 'absolute', right: 0, top: 'calc(100% + 6px)', bottom: 'auto', zIndex: 500,
-                                background: 'var(--bg-card)', border: '1px solid var(--border-light)',
-                                borderRadius: '12px', boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
-                                minWidth: '160px'
+                                position: 'absolute', right: 0, top: 'calc(100% + 4px)', zIndex: 500,
+                                background: 'var(--bg-elevated)', border: '1px solid var(--border)',
+                                borderRadius: 'var(--radius)', boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+                                minWidth: '150px', overflow: 'hidden',
                               }}>
                                 {doc.status === 'ready' && (
                                   <>
-                                    <button className="doc-menu-item" onClick={() => { handlePreview(doc); setOpenMenuId(null); }}>👁 View</button>
-                                    <button className="doc-menu-item" onClick={() => { handleDownload(doc); setOpenMenuId(null); }}>⬇️ Download</button>
-                                    <button className="doc-menu-item" onClick={() => { openVersionModal(doc); setOpenMenuId(null); }}>🕒 Versions</button>
-                                    <button className="doc-menu-item" onClick={() => { openAnalyticsModal(doc); setOpenMenuId(null); }}>📈 Analytics</button>
+                                    <button className="doc-menu-item" onClick={() => { handlePreview(doc); setOpenMenuId(null); }}><Eye size={14} /> View</button>
+                                    <button className="doc-menu-item" onClick={() => { handleDownload(doc); setOpenMenuId(null); }}><Download size={14} /> Download</button>
+                                    <button className="doc-menu-item" onClick={() => { openVersionModal(doc); setOpenMenuId(null); }}><Clock size={14} /> Versions</button>
+                                    <button className="doc-menu-item" onClick={() => { openAnalyticsModal(doc); setOpenMenuId(null); }}><BarChart3 size={14} /> Analytics</button>
                                   </>
                                 )}
                                 {doc.status === 'failed' && (
-                                  <div style={{ padding: '0.6rem 1rem', fontSize: '0.8rem', color: '#ef4444' }}>❌ Encryption failed</div>
+                                  <div style={{ padding: '0.6rem 1rem', fontSize: '0.8rem', color: 'var(--error)' }}>Encryption failed</div>
                                 )}
                                 {user?.role === 'admin' && (
-                                  <button
-                                    className="doc-menu-item"
-                                    style={{ color: '#ef4444', borderTop: '1px solid var(--border-light)' }}
-                                    onClick={() => { handleDelete(doc); setOpenMenuId(null); }}
-                                  >
-                                    🗑️ Delete
+                                  <button className="doc-menu-item" style={{ color: 'var(--error)', borderTop: '1px solid var(--border)' }}
+                                    onClick={() => { handleDelete(doc); setOpenMenuId(null); }}>
+                                    <Trash2 size={14} /> Delete
                                   </button>
                                 )}
                               </div>
@@ -447,9 +376,9 @@ const Documents = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
-      </main>
 
       {/* ── Version History Modal ─────────────────────────────── */}
       {versionModal && (

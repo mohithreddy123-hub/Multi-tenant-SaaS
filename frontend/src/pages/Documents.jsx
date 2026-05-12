@@ -39,6 +39,7 @@ const Documents = () => {
 
   const [versionModal, setVersionModal] = useState(null);   // { doc }
   const [analyticsModal, setAnalyticsModal] = useState(null); // { doc, data }
+  const [previewModal, setPreviewModal] = useState(null);    // { doc, url, type }
   const [rollingBack, setRollingBack] = useState(false);
   const [showAttach, setShowAttach] = useState(false);
   const [acceptType, setAcceptType] = useState("*/*");
@@ -139,15 +140,25 @@ const Documents = () => {
   };
 
   const handlePreview = async (doc) => {
+    const previewable = doc.file_type?.startsWith('image/') || doc.file_type === 'application/pdf';
+    if (!previewable) {
+      // Non-previewable: just download it
+      return handleDownload(doc);
+    }
     try {
       const res = await api.get(`/documents/${doc.id}/preview/`, { responseType: 'blob' });
-      const blob = new Blob([res.data], { type: doc.file_type || 'application/octet-stream' });
+      const blob = new Blob([res.data], { type: doc.file_type });
       const url = window.URL.createObjectURL(blob);
-      window.open(url, '_blank');
+      setPreviewModal({ doc, url, type: doc.file_type });
       fetchDocuments(); // refresh view count
     } catch (err) {
       alert('Could not preview this file. Try downloading it instead.');
     }
+  };
+
+  const closePreviewModal = () => {
+    if (previewModal?.url) window.URL.revokeObjectURL(previewModal.url);
+    setPreviewModal(null);
   };
 
   const handleDelete = async (doc) => {
@@ -496,6 +507,75 @@ const Documents = () => {
             </BarChart>
           </ResponsiveContainer>
         </Modal>
+      )}
+
+      {/* ── File Preview Modal ────────────────────────────────── */}
+      {previewModal && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)',
+          backdropFilter: 'blur(8px)', display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1rem'
+        }}>
+          {/* Header bar */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            width: '100%', maxWidth: '960px', marginBottom: '0.75rem'
+          }}>
+            <span style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              👁 {previewModal.doc.title}
+            </span>
+            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+              <button
+                onClick={() => handleDownload(previewModal.doc)}
+                style={{
+                  background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.4)',
+                  color: '#a5b4fc', borderRadius: '8px', padding: '0.4rem 0.9rem',
+                  cursor: 'pointer', fontSize: '0.85rem'
+                }}
+              >
+                ⬇️ Download
+              </button>
+              <button
+                onClick={closePreviewModal}
+                style={{
+                  background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)',
+                  color: '#f87171', borderRadius: '8px', padding: '0.4rem 0.9rem',
+                  cursor: 'pointer', fontSize: '0.85rem'
+                }}
+              >
+                ✕ Close
+              </button>
+            </div>
+          </div>
+
+          {/* Preview content */}
+          <div style={{
+            width: '100%', maxWidth: '960px', flex: 1, maxHeight: 'calc(100vh - 120px)',
+            borderRadius: '16px', overflow: 'hidden',
+            border: '1px solid rgba(255,255,255,0.1)',
+            background: '#0f0f1a', display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            {previewModal.type?.startsWith('image/') ? (
+              <img
+                src={previewModal.url}
+                alt={previewModal.doc.title}
+                style={{ maxWidth: '100%', maxHeight: 'calc(100vh - 140px)', objectFit: 'contain', borderRadius: '12px' }}
+              />
+            ) : previewModal.type === 'application/pdf' ? (
+              <iframe
+                src={previewModal.url}
+                title={previewModal.doc.title}
+                style={{ width: '100%', height: 'calc(100vh - 140px)', border: 'none', borderRadius: '12px' }}
+              />
+            ) : (
+              <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '3rem' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📄</div>
+                <p>Preview not available for this file type.</p>
+                <button className="btn btn-primary" onClick={() => handleDownload(previewModal.doc)}>⬇️ Download Instead</button>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

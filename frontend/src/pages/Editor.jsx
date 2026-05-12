@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import api from '../api';
-import { useMobileSidebar } from '../hooks/useMobileSidebar';
+import { Wifi, WifiOff, Users, Lock, Radio } from 'lucide-react';
 
 const COLORS = [
   '#60a5fa', '#34d399', '#f472b6', '#fbbf24', '#a78bfa',
@@ -10,20 +10,17 @@ const COLORS = [
 ];
 
 const Editor = () => {
-  const { user, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const { docId } = useParams();  // 0 = scratch pad, otherwise real doc
+  const { user } = useContext(AuthContext);
+  const { docId } = useParams();
   const [text, setText] = useState('');
   const [connected, setConnected] = useState(false);
   const [activeUsers, setActiveUsers] = useState([]);
-  const [cursors, setCursors] = useState({});         // { username: { top, left, color } }
+  const [cursors, setCursors] = useState({});
   const [docTitle, setDocTitle] = useState('Collaborative Scratch Pad');
   const wsRef = useRef(null);
   const textareaRef = useRef(null);
   const selfUsername = user?.username || 'Anonymous';
-  const { sidebarOpen, toggleSidebar, closeSidebar } = useMobileSidebar();
 
-  // ── Assign color per username ──
   const colorMap = useRef({});
   const getColor = (username) => {
     if (!colorMap.current[username]) {
@@ -34,7 +31,6 @@ const Editor = () => {
   };
 
   useEffect(() => {
-    // If a real doc ID, load its content (decode from API for preview display only)
     if (docId && docId !== '0') {
       api.get('/documents/').then(res => {
         const doc = res.data.find(d => String(d.id) === docId);
@@ -42,7 +38,6 @@ const Editor = () => {
       }).catch(() => {});
     }
 
-    // Open WebSocket to editor room — with auto-reconnect (Fix 3)
     const id = docId || '0';
     let retryCount = 0;
     const maxRetries = 5;
@@ -100,9 +95,7 @@ const Editor = () => {
     setText(newText);
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
-        event: 'text_change',
-        username: selfUsername,
-        content: newText,
+        event: 'text_change', username: selfUsername, content: newText,
       }));
     }
   };
@@ -111,10 +104,8 @@ const Editor = () => {
     const rect = textareaRef.current?.getBoundingClientRect();
     if (!rect || wsRef.current?.readyState !== WebSocket.OPEN) return;
     wsRef.current.send(JSON.stringify({
-      event: 'cursor_move',
-      username: selfUsername,
-      top: e.clientY - rect.top,
-      left: e.clientX - rect.left,
+      event: 'cursor_move', username: selfUsername,
+      top: e.clientY - rect.top, left: e.clientX - rect.left,
     }));
   };
 
@@ -122,148 +113,86 @@ const Editor = () => {
   const charCount = text.length;
 
   return (
-    <div className="app-layout">
-      {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
-      <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
-      {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>{user?.tenant?.name || 'Workspace'}</h2>
-          <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Editor</p>
+    <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 4rem)' }}>
+      {/* Header */}
+      <div className="tv-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h1 className="tv-page-title">{docTitle}</h1>
+          <p className="tv-page-desc">{wordCount} words · {charCount} characters</p>
         </div>
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
-          <Link onClick={closeSidebar} to="/billing" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>💳 Billing</Link>
-          <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
-          <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>✏️ Collab Editor</button>
-          <Link onClick={closeSidebar} to="/team" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>👥 Team</Link>
-          <Link onClick={closeSidebar} to="/settings" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>⚙️ Settings</Link>
-        </nav>
-
-        {/* Active collaborators */}
-        <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Active Now
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#34d399', display: 'inline-block' }}></span>
-              <span style={{ fontSize: '0.85rem' }}>{selfUsername} (you)</span>
-            </div>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className={`tv-badge ${connected ? 'tv-badge-success' : 'tv-badge-error'}`} style={{ padding: '0.35rem 0.8rem', fontSize: '0.78rem' }}>
+            {connected ? <><Wifi size={12} /> Live · {activeUsers.length + 1} online</> : <><WifiOff size={12} /> Disconnected</>}
+          </div>
+          <div className="tv-badge tv-badge-info" style={{ padding: '0.35rem 0.8rem', fontSize: '0.78rem' }}>
+            Room: doc-{docId || '0'}
+          </div>
+          {/* Active users avatars */}
+          <div style={{ display: 'flex', gap: '0.25rem' }}>
+            <div className="tv-avatar" style={{ width: 28, height: 28, fontSize: '0.7rem' }}>{selfUsername[0].toUpperCase()}</div>
             {activeUsers.map(u => (
-              <div key={u} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: getColor(u), display: 'inline-block' }}></span>
-                <span style={{ fontSize: '0.85rem' }}>{u}</span>
+              <div key={u} className="tv-avatar" style={{ width: 28, height: 28, fontSize: '0.7rem', background: getColor(u) }}>
+                {u[0].toUpperCase()}
               </div>
             ))}
           </div>
         </div>
+      </div>
 
-        <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <p style={{ margin: 0, fontWeight: 500, color: 'var(--text-primary)' }}>{user?.username}</p>
-            <p style={{ margin: 0, fontSize: '0.8rem' }}>{user?.role}</p>
-          </div>
-          <button onClick={() => { logout(); navigate('/login'); }} className="btn btn-secondary btn-block"
-            style={{ borderColor: 'var(--accent-error)', color: 'var(--accent-error)' }}>
-            Log Out
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Editor */}
-      <main className="main-content" style={{ display: 'flex', flexDirection: 'column' }}>
-        {/* Header */}
-        <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <div>
-            <h1 style={{ marginBottom: '0.25rem' }}>{docTitle}</h1>
-            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-              {wordCount} words · {charCount} characters
-            </p>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      {/* Editor area */}
+      <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {Object.entries(cursors).map(([username, pos]) => (
+          <div key={username} style={{
+            position: 'absolute', top: pos.top + 60, left: pos.left + 16,
+            pointerEvents: 'none', zIndex: 10,
+          }}>
+            <div style={{ width: 2, height: 20, background: pos.color, borderRadius: '2px' }} />
             <div style={{
-              display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: connected ? 'rgba(52,211,153,0.1)' : 'rgba(239,68,68,0.1)',
-              color: connected ? 'var(--accent-success)' : 'var(--accent-error)',
-              padding: '0.4rem 0.9rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 500
-            }}>
-              <span style={{
-                width: 7, height: 7, borderRadius: '50%', display: 'inline-block',
-                background: connected ? 'var(--accent-success)' : 'var(--accent-error)',
-                animation: connected ? 'pulse 2s infinite' : 'none'
-              }}></span>
-              {connected ? `Live · ${activeUsers.length + 1} online` : 'Disconnected'}
-            </div>
-            <div style={{
-              background: 'rgba(255,255,255,0.05)', padding: '0.4rem 0.9rem',
-              borderRadius: '10px', fontSize: '0.8rem', color: 'var(--text-secondary)'
-            }}>
-              Room: doc-{docId || '0'}
-            </div>
+              background: pos.color, color: '#000', fontSize: '0.65rem', fontWeight: 600,
+              padding: '1px 5px', borderRadius: '4px', whiteSpace: 'nowrap',
+            }}>{username}</div>
           </div>
-        </header>
+        ))}
 
-        {/* Editor area */}
-        <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Remote cursors */}
-          {Object.entries(cursors).map(([username, pos]) => (
-            <div key={username} style={{
-              position: 'absolute', top: pos.top + 60, left: pos.left + 16,
-              pointerEvents: 'none', zIndex: 10,
-            }}>
-              <div style={{ width: 2, height: 20, background: pos.color, borderRadius: '2px' }} />
-              <div style={{
-                background: pos.color, color: '#000', fontSize: '0.7rem', fontWeight: 600,
-                padding: '1px 6px', borderRadius: '4px', whiteSpace: 'nowrap',
-                transform: 'translateY(-2px)', marginTop: '-2px'
-              }}>{username}</div>
-            </div>
-          ))}
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={handleTextChange}
+          onMouseMove={handleMouseMove}
+          placeholder={`Start typing... Changes sync live to everyone in this room.\n\nOpen this URL in another browser tab to see real-time collaboration.`}
+          style={{
+            flex: 1, minHeight: '400px',
+            background: 'var(--bg-card)', border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)', padding: '1.5rem',
+            color: 'var(--text-primary)', fontSize: '0.95rem', lineHeight: '1.8',
+            fontFamily: "'Inter', sans-serif", resize: 'vertical', outline: 'none',
+            transition: 'border-color var(--transition)',
+          }}
+          onFocus={e => e.target.style.borderColor = 'var(--accent)'}
+          onBlur={e => e.target.style.borderColor = 'var(--border)'}
+        />
+      </div>
 
-          <textarea
-            ref={textareaRef}
-            value={text}
-            onChange={handleTextChange}
-            onMouseMove={handleMouseMove}
-            placeholder={`Start typing... Your changes sync live to everyone in this room.\n\nThis is a collaborative scratch pad. Open this URL in another browser tab to see real-time collaboration in action.`}
-            style={{
-              flex: 1,
-              minHeight: '500px',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--border-light)',
-              borderRadius: '16px',
-              padding: '2rem',
-              color: 'var(--text-primary)',
-              fontSize: '1rem',
-              lineHeight: '1.7',
-              fontFamily: "'Inter', 'Segoe UI', sans-serif",
-              resize: 'vertical',
-              outline: 'none',
-              transition: 'border-color 0.2s',
-            }}
-            onFocus={e => e.target.style.borderColor = 'var(--brand-primary)'}
-            onBlur={e => e.target.style.borderColor = 'var(--border-light)'}
-          />
-        </div>
-
-        {/* Footer tips */}
-        <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          {[
-            { icon: '🔴', text: 'Changes sync live via WebSocket' },
-            { icon: '👥', text: 'Other users\' cursors shown in real-time' },
-            { icon: '🔒', text: 'Session is scoped to this document room' },
-          ].map(tip => (
+      {/* Footer tips */}
+      <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        {[
+          { icon: Radio, text: 'Changes sync live via WebSocket' },
+          { icon: Users, text: "Other users' cursors shown in real-time" },
+          { icon: Lock, text: 'Session scoped to this document room' },
+        ].map(tip => {
+          const Icon = tip.icon;
+          return (
             <div key={tip.text} style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: 'rgba(255,255,255,0.04)', padding: '0.4rem 0.85rem',
-              borderRadius: '8px', fontSize: '0.8rem', color: 'var(--text-secondary)'
+              background: 'rgba(255,255,255,0.03)', padding: '0.4rem 0.85rem',
+              borderRadius: '8px', fontSize: '0.78rem', color: 'var(--text-tertiary)',
+              border: '1px solid var(--border)',
             }}>
-              <span>{tip.icon}</span> {tip.text}
+              <Icon size={13} /> {tip.text}
             </div>
-          ))}
-        </div>
-      </main>
+          );
+        })}
+      </div>
     </div>
   );
 };

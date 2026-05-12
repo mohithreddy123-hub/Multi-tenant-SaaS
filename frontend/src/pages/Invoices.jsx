@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
 import { AuthContext } from '../contexts/AuthContext';
-import { useMobileSidebar } from '../hooks/useMobileSidebar';
+import { CreditCard } from 'lucide-react';
 
 /* ════════════════════════════════════════════════════
    AMAZON-STYLE PAYMENT GATEWAY
@@ -506,9 +506,8 @@ const Invoices = () => {
     const [invoices, setInvoices]         = useState([]);
     const [loading, setLoading]           = useState(true);
     const [activeInvoice, setActiveInvoice] = useState(null);
-    const [paidInvoice, setPaidInvoice]   = useState(null); // for receipt
+    const [paidInvoice, setPaidInvoice]   = useState(null);
     const [message, setMessage]           = useState(null);
-    const { sidebarOpen, toggleSidebar, closeSidebar } = useMobileSidebar();
 
     useEffect(() => { fetchInvoices(); }, []);
 
@@ -529,7 +528,6 @@ const Invoices = () => {
             setTimeout(() => {
                 setActiveInvoice(null);
                 fetchInvoices().then(() => {
-                    // Find the just-paid invoice from fresh data or construct minimal object
                     setPaidInvoice({ id: invoiceId, amount: activeInvoice?.amount, payment_method: method });
                 });
                 setMessage({ type: 'success', text: res.data.message });
@@ -540,82 +538,58 @@ const Invoices = () => {
         }
     };
 
-    if (loading) return <div className="auth-container"><span className="loader" /></div>;
+    if (loading) return (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+            <div className="tv-loader" style={{ width: 36, height: 36, borderWidth: 3 }} />
+        </div>
+    );
 
     return (
-        <div className="app-layout">
-            {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
-            <button className="mobile-menu-btn" onClick={toggleSidebar}>☰</button>
-            <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-                <div style={{ marginBottom: '2rem' }}>
-                    <h2 style={{ color: 'var(--brand-primary)', margin: 0 }}>TenantVault</h2>
-                    <p style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>Billing & Invoices</p>
+        <div className="animate-in">
+            <div className="tv-page-header">
+                <h1 className="tv-page-title">Billing & Subscriptions</h1>
+                <p className="tv-page-desc">Pay invoices securely using UPI, Cards, Net Banking, or EMI.</p>
+            </div>
+
+            {message && (
+                <div style={{
+                    padding: '0.7rem 1rem', borderRadius: 8, marginBottom: '1rem',
+                    background: message.type === 'success' ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
+                    borderLeft: `3px solid ${message.type === 'success' ? 'var(--success)' : 'var(--error)'}`,
+                    color: message.type === 'success' ? 'var(--success)' : 'var(--error)',
+                    fontSize: '0.85rem', fontWeight: 500,
+                }}>
+                    {message.text}
                 </div>
-                <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <Link onClick={closeSidebar} to="/dashboard" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📊 Dashboard</Link>
-                    <button onClick={closeSidebar} className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'rgba(255,255,255,0.05)' }}>💳 Billing</button>
-                    <Link onClick={closeSidebar} to="/documents" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>📄 Documents</Link>
-                    <Link onClick={closeSidebar} to="/editor/0"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>✏️ Collab Editor</Link>
-                    <Link onClick={closeSidebar} to="/team"      className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>👥 Team</Link>
-                    <Link onClick={closeSidebar} to="/settings"  className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none' }}>⚙️ Settings</Link>
-                </nav>
-                <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
-                    <button onClick={() => { logout(); navigate('/login'); }}
-                        className="btn btn-secondary btn-block"
-                        style={{ borderColor: 'var(--accent-error)', color: 'var(--accent-error)' }}>
-                        Log Out
-                    </button>
-                </div>
-            </aside>
+            )}
 
-            <main className="main-content">
-                <header className="page-header">
-                    <div>
-                        <h1>Billing & Subscriptions</h1>
-                        <p style={{ margin: 0 }}>Pay invoices securely using UPI, Cards, Net Banking, or EMI.</p>
-                    </div>
-                </header>
-
-                {message && (
-                    <div className="error-message" style={{
-                        background: message.type === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
-                        borderLeftColor: message.type === 'success' ? 'var(--accent-success)' : 'var(--accent-error)',
-                        color: message.type === 'success' ? 'var(--accent-success)' : 'var(--accent-error)',
-                    }}>
-                        {message.type === 'success' ? '✅ ' : '❌ '}{message.text}
-                    </div>
-                )}
-
-                <div className="glass-panel" style={{ padding: 0 }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <div className="tv-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ overflowX: 'auto' }}>
+                    <table className="tv-table">
                         <thead>
-                            <tr style={{ borderBottom: '1px solid var(--border-light)' }}>
+                            <tr>
                                 {['Invoice #', 'Issued Date', 'Amount', 'Status', 'Payment Action'].map(h => (
-                                    <th key={h} style={{ padding: '1.25rem 1.5rem', color: 'var(--text-secondary)', fontSize: '0.82rem', fontWeight: 600 }}>{h}</th>
+                                    <th key={h}>{h}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {invoices.map(inv => (
-                                <tr key={inv.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
-                                    <td style={{ padding: '1.25rem 1.5rem', fontFamily: 'monospace', fontSize: '0.9rem' }}>#{inv.id}</td>
-                                    <td style={{ padding: '1.25rem 1.5rem', fontSize: '0.88rem' }}>{new Date(inv.issued_at).toLocaleDateString('en-IN')}</td>
-                                    <td style={{ padding: '1.25rem 1.5rem', fontWeight: 700 }}>₹{inv.amount}</td>
-                                    <td style={{ padding: '1.25rem 1.5rem' }}>
-                                        <span style={{
-                                            padding: '0.25rem 0.7rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600,
-                                            background: inv.status === 'paid' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
-                                            color: inv.status === 'paid' ? 'var(--accent-success)' : '#f59e0b',
-                                        }}>
+                                <tr key={inv.id}>
+                                    <td style={{ fontFamily: 'monospace' }}>#{inv.id}</td>
+                                    <td>{new Date(inv.issued_at).toLocaleDateString('en-IN')}</td>
+                                    <td style={{ fontWeight: 700 }}>₹{inv.amount}</td>
+                                    <td>
+                                        <span className={`tv-badge ${inv.status === 'paid' ? 'tv-badge-success' : 'tv-badge-warning'}`}>
                                             {inv.status.toUpperCase()}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '1.25rem 1.5rem' }}>
+                                    <td>
                                         {inv.status === 'pending' ? (
                                             <button onClick={() => setActiveInvoice(inv)}
-                                                className="btn btn-primary"
-                                                style={{ padding: '0.5rem 1.25rem', fontSize: '0.82rem' }}>
-                                                💳 Pay Now
+                                                className="tv-btn tv-btn-primary"
+                                                style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
+                                                <CreditCard size={14} /> Pay Now
                                             </button>
                                         ) : (
                                             <span style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
@@ -627,13 +601,15 @@ const Invoices = () => {
                             ))}
                         </tbody>
                     </table>
-                    {invoices.length === 0 && (
-                        <p style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No invoices found.</p>
-                    )}
                 </div>
-            </main>
+                {invoices.length === 0 && (
+                    <div className="tv-empty">
+                        <div className="tv-empty-icon"><CreditCard size={48} /></div>
+                        <h3>No invoices found</h3>
+                    </div>
+                )}
+            </div>
 
-            {/* Payment Gateway Modal */}
             {activeInvoice && !paidInvoice && (
                 <PaymentGateway
                     invoice={activeInvoice}
@@ -642,7 +618,6 @@ const Invoices = () => {
                 />
             )}
 
-            {/* Transaction Receipt Modal */}
             {paidInvoice && (
                 <TransactionReceipt
                     invoice={paidInvoice}

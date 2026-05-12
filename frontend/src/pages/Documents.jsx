@@ -152,7 +152,8 @@ const Documents = () => {
       setPreviewModal({ doc, url, type: doc.file_type });
       fetchDocuments(); // refresh view count
     } catch (err) {
-      alert('Could not preview this file. Try downloading it instead.');
+      const msg = err.response?.data?.detail || err.message || 'Could not preview this file.';
+      alert(`Preview error: ${msg}`);
     }
   };
 

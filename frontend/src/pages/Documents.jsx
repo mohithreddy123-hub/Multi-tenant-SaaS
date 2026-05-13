@@ -36,7 +36,32 @@ const Documents = () => {
   const [rollingBack, setRollingBack] = useState(false);
   const [showAttach, setShowAttach] = useState(false);
   const [acceptType, setAcceptType] = useState("*/*");
-  const [openMenuId, setOpenMenuId] = useState(null); // tracks which row's 3-dot menu is open
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+  const menuRef = useRef(null);
+
+  // Close the dropdown when clicking anywhere outside
+  useEffect(() => {
+    if (!openMenuId) return;
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openMenuId]);
+
+  // Calculate fixed position from the button's screen coordinates
+  const handleOpenMenu = (e, docId) => {
+    if (openMenuId === docId) { setOpenMenuId(null); return; }
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMenuPos({
+      top: rect.bottom + 4,
+      right: window.innerWidth - rect.right,
+    });
+    setOpenMenuId(docId);
+  };
 
   useEffect(() => { fetchDocuments(); }, []);
 
@@ -297,7 +322,7 @@ const Documents = () => {
               <p>Upload a file to get started. It will be securely encrypted.</p>
             </div>
           ) : (
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto', position: 'relative' }}>
             <table className="tv-table">
               <thead>
                 <tr>
@@ -330,47 +355,17 @@ const Documents = () => {
                       )}
                     </td>
                     <td style={{ textAlign: 'right' }}>
-                      <div style={{ position: 'relative', display: 'inline-block' }}>
-                        {doc.status === 'pending' ? (
-                          <span className="tv-badge tv-badge-warning" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                            <Loader size={12} style={{ animation: 'spin 1s linear infinite' }} /> Encrypting...
-                          </span>
-                        ) : (
-                          <>
-                            <button className="tv-btn tv-btn-ghost"
-                              onClick={() => setOpenMenuId(openMenuId === doc.id ? null : doc.id)}
-                              style={{ padding: '0.3rem' }}>
-                              <MoreVertical size={16} />
-                            </button>
-                            {openMenuId === doc.id && (
-                              <div style={{
-                                position: 'absolute', right: 0, top: 'calc(100% + 4px)', zIndex: 500,
-                                background: 'var(--bg-elevated)', border: '1px solid var(--border)',
-                                borderRadius: 'var(--radius)', boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
-                                minWidth: '150px', overflow: 'hidden',
-                              }}>
-                                {doc.status === 'ready' && (
-                                  <>
-                                    <button className="doc-menu-item" onClick={() => { handlePreview(doc); setOpenMenuId(null); }}><Eye size={14} /> View</button>
-                                    <button className="doc-menu-item" onClick={() => { handleDownload(doc); setOpenMenuId(null); }}><Download size={14} /> Download</button>
-                                    <button className="doc-menu-item" onClick={() => { openVersionModal(doc); setOpenMenuId(null); }}><Clock size={14} /> Versions</button>
-                                    <button className="doc-menu-item" onClick={() => { openAnalyticsModal(doc); setOpenMenuId(null); }}><BarChart3 size={14} /> Analytics</button>
-                                  </>
-                                )}
-                                {doc.status === 'failed' && (
-                                  <div style={{ padding: '0.6rem 1rem', fontSize: '0.8rem', color: 'var(--error)' }}>Encryption failed</div>
-                                )}
-                                {user?.role === 'admin' && (
-                                  <button className="doc-menu-item" style={{ color: 'var(--error)', borderTop: '1px solid var(--border)' }}
-                                    onClick={() => { handleDelete(doc); setOpenMenuId(null); }}>
-                                    <Trash2 size={14} /> Delete
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
+                      {doc.status === 'pending' ? (
+                        <span className="tv-badge tv-badge-warning" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <Loader size={12} style={{ animation: 'spin 1s linear infinite' }} /> Encrypting...
+                        </span>
+                      ) : (
+                        <button className="tv-btn tv-btn-ghost"
+                          onClick={(e) => handleOpenMenu(e, doc.id)}
+                          style={{ padding: '0.3rem' }}>
+                          <MoreVertical size={16} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -379,6 +374,47 @@ const Documents = () => {
             </div>
           )}
         </div>
+
+      {/* ── Context Menu Portal — renders outside the overflow container ── */}
+      {openMenuId && (() => {
+        const doc = documents.find(d => d.id === openMenuId);
+        if (!doc) return null;
+        return (
+          <div
+            ref={menuRef}
+            style={{
+              position: 'fixed',
+              top: menuPos.top,
+              right: menuPos.right,
+              zIndex: 9999,
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+              minWidth: '160px',
+              overflow: 'hidden',
+            }}
+          >
+            {doc.status === 'ready' && (
+              <>
+                <button className="doc-menu-item" onClick={() => { handlePreview(doc); setOpenMenuId(null); }}><Eye size={14} /> View</button>
+                <button className="doc-menu-item" onClick={() => { handleDownload(doc); setOpenMenuId(null); }}><Download size={14} /> Download</button>
+                <button className="doc-menu-item" onClick={() => { openVersionModal(doc); setOpenMenuId(null); }}><Clock size={14} /> Versions</button>
+                <button className="doc-menu-item" onClick={() => { openAnalyticsModal(doc); setOpenMenuId(null); }}><BarChart3 size={14} /> Analytics</button>
+              </>
+            )}
+            {doc.status === 'failed' && (
+              <div style={{ padding: '0.6rem 1rem', fontSize: '0.8rem', color: 'var(--error)' }}>Encryption failed</div>
+            )}
+            {user?.role === 'admin' && (
+              <button className="doc-menu-item" style={{ color: 'var(--error)', borderTop: '1px solid var(--border)' }}
+                onClick={() => { handleDelete(doc); setOpenMenuId(null); }}>
+                <Trash2 size={14} /> Delete
+              </button>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ── Version History Modal ─────────────────────────────── */}
       {versionModal && (

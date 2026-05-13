@@ -22,8 +22,9 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const handleLogout = () => {
+  const confirmLogout = () => {
     logout();
     navigate('/login');
   };
@@ -90,11 +91,39 @@ const Layout = ({ children }) => {
               <span className="tv-user-role">{user?.role}</span>
             </div>
           )}
-          <button className="tv-logout-btn" onClick={handleLogout} title="Log out">
+          <button className="tv-logout-btn" onClick={() => setShowLogoutModal(true)} title="Log out">
             <LogOut size={16} />
           </button>
         </div>
       </aside>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="tv-modal-overlay" onClick={() => setShowLogoutModal(false)}>
+          <div className="tv-modal" style={{ maxWidth: '400px', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+            <div style={{ 
+              width: '48px', height: '48px', borderRadius: '50%', 
+              background: 'rgba(239,68,68,0.1)', color: 'var(--error)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 1.25rem'
+            }}>
+              <LogOut size={24} />
+            </div>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Confirm Logout</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.75rem', fontSize: '0.9rem' }}>
+              Are you sure you want to end your current session? You will need to log in again to access your workspace.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button className="tv-btn tv-btn-secondary tv-btn-block" onClick={() => setShowLogoutModal(false)}>
+                Cancel
+              </button>
+              <button className="tv-btn tv-btn-danger tv-btn-block" onClick={confirmLogout}>
+                Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main content */}
       <main className="tv-main">

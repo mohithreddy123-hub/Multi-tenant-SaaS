@@ -40,7 +40,6 @@
 ::-webkit-scrollbar-thumb { 
   background: var(--border); 
   border-radius: 10px;
-  transition: background 0.2s;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
 
@@ -120,7 +119,9 @@ body {
   font-size: 1.1rem;
   background: linear-gradient(135deg, var(--accent), var(--accent-cyan));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
   white-space: nowrap;
 }
 
@@ -265,8 +266,8 @@ body {
 /* ═══ UTILITIES ═══ */
 .glass-panel {
   background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: var(--glass);
   -webkit-backdrop-filter: var(--glass);
+  backdrop-filter: var(--glass);
   border: 1px solid var(--border);
 }
 
@@ -278,6 +279,8 @@ body {
 .text-gradient {
   background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 

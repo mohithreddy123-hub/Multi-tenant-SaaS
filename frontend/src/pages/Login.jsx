@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import api from '../api';
+import { Eye, EyeOff } from 'lucide-react';
 
 /* ─── Landing Page ─────────────────────────────────────── */
 const LandingPage = ({ onGetStarted }) => (
@@ -122,6 +123,7 @@ const LoginModal = ({ onClose }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (location.state?.message) {
@@ -174,8 +176,37 @@ const LoginModal = ({ onClose }) => {
           </div>
           <div className="input-group">
             <label className="input-label">Password</label>
-            <input type="password" className="form-input" placeholder="••••••••" required
-              value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
+            <div style={{ position: 'relative' }}>
+              <input 
+                type={showPassword ? "text" : "password"} 
+                className="form-input" 
+                placeholder="••••••••" 
+                required
+                style={{ paddingRight: '2.5rem' }}
+                value={formData.password} 
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '0.75rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
             {loading ? <span className="loader" /> : 'Sign In'}

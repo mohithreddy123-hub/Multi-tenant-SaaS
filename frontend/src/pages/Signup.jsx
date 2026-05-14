@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
+import { Eye, EyeOff } from 'lucide-react';
 
 /* ─── Step Indicator ───────────────────────────────────── */
 const StepBar = ({ current }) => {
@@ -76,6 +77,8 @@ const Signup = () => {
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const PLAN_INFO = {
     starter:    { price: '₹99/mo',  users: '5 Users',    storage: '50 GB' },
@@ -232,12 +235,36 @@ const Signup = () => {
 
             <div className="input-group">
               <label className="input-label">Password</label>
-              <input
-                type="password" className="form-input"
-                placeholder="Min. 6 characters"
-                value={formData.password}
-                onChange={e => set('password', e.target.value)}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? "text" : "password"} 
+                  className="form-input"
+                  placeholder="Min. 6 characters"
+                  style={{ paddingRight: '2.5rem' }}
+                  value={formData.password}
+                  onChange={e => set('password', e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '0.75rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               {/* Strength bar */}
               {pw && (
                 <div style={{ marginTop: '0.5rem' }}>
@@ -259,12 +286,36 @@ const Signup = () => {
 
             <div className="input-group">
               <label className="input-label">Confirm Password</label>
-              <input
-                type="password" className="form-input"
-                placeholder="Retype your password"
-                value={formData.confirm_password}
-                onChange={e => set('confirm_password', e.target.value)}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showConfirmPassword ? "text" : "password"} 
+                  className="form-input"
+                  placeholder="Retype your password"
+                  style={{ paddingRight: '2.5rem' }}
+                  value={formData.confirm_password}
+                  onChange={e => set('confirm_password', e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '0.75rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               {formData.confirm_password && (
                 <p style={{
                   margin: '0.35rem 0 0', fontSize: '0.78rem',

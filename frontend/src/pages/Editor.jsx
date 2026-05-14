@@ -167,6 +167,14 @@ const Editor = () => {
             [data.username]: { top: data.top, left: data.left, color: getColor(data.username) }
           }));
         }
+        if (data.event === 'chat_message') {
+          setMessages(prev => [...prev, { 
+            user: data.username, 
+            text: data.text, 
+            time: data.time, 
+            id: data.id 
+          }]);
+        }
       };
 
       ws.onclose = () => {
@@ -223,7 +231,18 @@ const Editor = () => {
   const sendMessage = () => {
     if (!chatInput.trim()) return;
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setMessages(prev => [...prev, { user: selfUsername, text: chatInput, time, id: Date.now() }]);
+    const messageId = Date.now();
+    
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        event: 'chat_message',
+        username: selfUsername,
+        text: chatInput,
+        time: time,
+        id: messageId
+      }));
+    }
+    
     setChatInput('');
   };
 

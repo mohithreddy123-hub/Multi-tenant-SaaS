@@ -168,12 +168,16 @@ const Editor = () => {
           }));
         }
         if (data.event === 'chat_message') {
-          setMessages(prev => [...prev, { 
-            user: data.username, 
-            text: data.text, 
-            time: data.time, 
-            id: data.id 
-          }]);
+          setMessages(prev => {
+            // Prevent duplicate messages if we already added it locally
+            if (prev.some(m => m.id === data.id)) return prev;
+            return [...prev, { 
+              user: data.username, 
+              text: data.text, 
+              time: data.time, 
+              id: data.id 
+            }];
+          });
         }
       };
 
@@ -219,7 +223,15 @@ const Editor = () => {
     typingTimer.current = setTimeout(() => {}, 1500);
   };
 
+  const lastMoveTime = useRef(0);
+  
   const handleMouseMove = (e) => {
+    const now = Date.now();
+    // Throttle cursor events to max 5 times per second (every 200ms)
+    // This prevents hitting the Upstash Redis 10k daily limit instantly
+    if (now - lastMoveTime.current < 200) return;
+    lastMoveTime.current = now;
+
     const rect = textareaRef.current?.getBoundingClientRect();
     if (!rect || wsRef.current?.readyState !== WebSocket.OPEN) return;
     wsRef.current.send(JSON.stringify({
@@ -233,6 +245,14 @@ const Editor = () => {
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const messageId = Date.now();
     
+    // Optimistic UI update - show message instantly for the sender
+    setMessages(prev => [...prev, { 
+      user: selfUsername, 
+      text: chatInput, 
+      time: time, 
+      id: messageId 
+    }]);
+
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         event: 'chat_message',

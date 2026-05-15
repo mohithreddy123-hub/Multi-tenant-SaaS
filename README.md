@@ -273,7 +273,6 @@ npm run dev
 4. Go to **👥 Team** to add your first employee.
 
 ---
-
 ## 🔜 Future Roadmap
 
 | # | Feature | Description |

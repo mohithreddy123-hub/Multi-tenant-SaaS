@@ -44,7 +44,11 @@ const Dashboard = () => {
 
       ws.onmessage = (e) => {
         const msg = JSON.parse(e.data);
-        if (msg.event === 'document_uploaded' || msg.event === 'document_deleted') {
+        if (
+          msg.event === 'document_uploaded' ||
+          msg.event === 'document_ready' ||
+          msg.event === 'document_deleted'
+        ) {
           setLiveEvent(msg);
           setTimeout(() => setLiveEvent(null), 4000);
           fetchDashboard();
@@ -101,17 +105,23 @@ const Dashboard = () => {
       {/* Live event banner */}
       {liveEvent && (
         <div style={{
-          background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(99,102,241,0.1))',
-          border: '1px solid rgba(16,185,129,0.25)',
+          background: liveEvent.event === 'document_deleted'
+            ? 'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(99,102,241,0.1))'
+            : 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(99,102,241,0.1))',
+          border: liveEvent.event === 'document_deleted'
+            ? '1px solid rgba(239,68,68,0.25)'
+            : '1px solid rgba(16,185,129,0.25)',
           borderRadius: 'var(--radius)',
           padding: '0.75rem 1.25rem',
           marginBottom: '1.5rem',
           display: 'flex', alignItems: 'center', gap: '0.75rem',
           animation: 'slideUp 0.3s ease',
         }}>
-          <Zap size={16} style={{ color: 'var(--success)' }} />
-          <span style={{ color: 'var(--success)', fontWeight: 500, fontSize: '0.85rem' }}>
-            Live: {liveEvent.uploader} uploaded "{liveEvent.doc_title}"
+          <Zap size={16} style={{ color: liveEvent.event === 'document_deleted' ? 'var(--error)' : 'var(--success)' }} />
+          <span style={{ color: liveEvent.event === 'document_deleted' ? 'var(--error)' : 'var(--success)', fontWeight: 500, fontSize: '0.85rem' }}>
+            {liveEvent.event === 'document_deleted'
+              ? `Live: ${liveEvent.user || 'Someone'} deleted "${liveEvent.doc_title || 'a file'}"`
+              : `Live: ${liveEvent.uploader || 'Someone'} uploaded "${liveEvent.doc_title || 'a file'}"`}
           </span>
         </div>
       )}

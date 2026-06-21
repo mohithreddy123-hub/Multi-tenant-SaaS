@@ -216,6 +216,8 @@ DOCUMENT_ENCRYPTION_KEY = env('DOCUMENT_ENCRYPTION_KEY')
 # RedisChannelLayer uses Upstash so web + worker can share WebSocket state.
 ASGI_APPLICATION = 'backend.asgi.application'
 
+import ssl
+
 _redis_url = env('REDIS_URL')
 
 if _redis_url.startswith('rediss://'):
@@ -226,7 +228,7 @@ if _redis_url.startswith('rediss://'):
             'CONFIG': {
                 'hosts': [{
                     'address': _redis_url,
-                    'ssl_cert_reqs': None,
+                    'ssl_cert_reqs': ssl.CERT_NONE,
                 }],
             },
         }

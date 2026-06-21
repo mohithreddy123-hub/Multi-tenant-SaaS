@@ -344,6 +344,8 @@ class DocumentDeleteView(APIView):
         try:
             _broadcast_dashboard_update(str(request.user.tenant.id), 'document_deleted', {
                 'doc_id': doc_id,
+                'doc_title': doc_title,
+                'user': request.user.username,
             })
         except Exception:
             pass

@@ -226,8 +226,8 @@ GET   /api/documents/<id>/versions/               Version history
 POST  /api/documents/<id>/rollback/<ver>/         Rollback to old version
 GET   /api/documents/<id>/analytics/              View/download/edit stats
 
-WebSocket: ws://localhost:8000/ws/tenant/<id>/    Live dashboard sync
-WebSocket: ws://localhost:8000/ws/editor/<id>/    Collaborative editing
+WS    /ws/tenant/<tenant_id>/                     Live dashboard sync
+WS    /ws/editor/<doc_id>/                        Collaborative editing
 ```
 
 ---

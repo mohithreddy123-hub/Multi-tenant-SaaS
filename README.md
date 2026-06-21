@@ -116,8 +116,9 @@ Each option pre-filters the OS file picker to show only the relevant type.
 - **AuditLog**: every action (UPLOAD, DOWNLOAD, EDIT, DELETE, LOGIN) is recorded.
 
 ### ⚡ Real-Time WebSocket Features
-- **Live Dashboard Sync (`DashboardConsumer`)**: If any user in the company uploads or deletes a file, every other user's dashboard instantly updates — no refresh needed.
+- **Live Dashboard Sync (`DashboardConsumer`)**: If any user in the company uploads, updates, or deletes a file, every other user's dashboard instantly updates and displays a live event banner (identifying the file name and the user who triggered the action) — no page refresh required.
 - **Collaborative Text Editor (`EditorConsumer`)**: Multiple users from the same company can type in a shared document simultaneously with live remote cursors.
+- **Production SSL Layer**: Configured with `ssl.CERT_NONE` to bypass strict verification for Upstash Redis channels, ensuring robust connections under containerized hosting environments (like Render).
 
 ### ⚙️ Full Settings Panel
 Six tabs: Profile, Security, Workspace, Billing & Plan, Notifications, Danger Zone.
